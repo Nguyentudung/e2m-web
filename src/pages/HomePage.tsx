@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import bgLight from "../assets/images/bg_light.jpg";
 import bgDark from "../assets/images/bg_dark.jpg";
 
+import SearchBar from "@/components/common/SearchBar";
+
 const slides = [bgLight, bgDark];
 
 function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Theo dõi theme hiện tại và cập nhật slide tương ứng
   useEffect(() => {
     const checkTheme = () => {
       const dark = document.documentElement.classList.contains("dark");
@@ -27,7 +28,6 @@ function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  // Tự động chuyển ảnh
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -38,13 +38,17 @@ function HomePage() {
 
   return (
     <section className="px-6 py-7">
+      {/* MOBILE SEARCH */}
+      <div className="mb-6 md:hidden">
+        <SearchBar />
+      </div>
+
       {/* HEADER TRANG */}
       <div className="flex items-start justify-between">
         <h1 className="text-4xl font-bold text-text-primary">Trang chính</h1>
 
         {/* BANNER */}
         <div className="relative mt-1 w-[34%] max-w-140 overflow-hidden rounded-2xl border border-border bg-surface">
-          {/* SLIDES */}
           <div
             className="flex transition-transform duration-700 ease-in-out"
             style={{
@@ -61,7 +65,6 @@ function HomePage() {
             ))}
           </div>
 
-          {/* DOT INDICATOR */}
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
             {slides.map((_, index) => (
               <button

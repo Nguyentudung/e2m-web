@@ -8,7 +8,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Menu11Icon } from "@hugeicons/core-free-icons";
 
 import DesktopNav from "../components/layout/DesktopNav";
-import MobileHeader from "../components/layout/MobileHeader";
 import BottomNav from "../components/layout/BottomNav";
 import ExpandableSearch from "../components/layout/ExpandableSearch";
 import RightDrawerMenu from "../components/layout/RightDrawerMenu";
@@ -60,11 +59,6 @@ function AppLayout() {
           </div>
         </div>
       </header>
-
-      {/* MOBILE HEADER */}
-      <div className="relative z-20 md:hidden">
-        <MobileHeader onOpenMenu={() => setIsDrawerOpen(true)} />
-      </div>
 
       {/* CONTENT */}
       <main className="relative z-10">
