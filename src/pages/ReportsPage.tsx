@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import chartImg from "../assets/icons/chart.png";
+import chartImg from "../assets/icons/charts.svg";
 import { Button } from "@/components/ui/button";
 
 function ReportsPage() {
@@ -10,7 +10,7 @@ function ReportsPage() {
       <img
         src={chartImg}
         alt="Báo cáo"
-        className="mb-4 h-40 w-40 object-contain"
+        className="mb-4 h-80 w-80 object-contain"
       />
       <h1 className="mb-6 text-xl font-bold text-text-primary">
         Chưa có dữ liệu báo cáo

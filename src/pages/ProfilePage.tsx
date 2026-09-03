@@ -1,5 +1,5 @@
 import { useState } from "react";
-import userImg from "../assets/icons/user.png";
+import profile from "../assets/icons/Profile.svg";
 import { Button } from "@/components/ui/button";
 
 function ProfilePage() {
@@ -8,19 +8,14 @@ function ProfilePage() {
   return (
     <section className="flex min-h-[75vh] flex-col items-center justify-center px-6 text-center">
       <img
-        src={userImg}
+        src={profile}
         alt="Cá nhân"
-        className="mb-4 h-40 w-40 object-contain"
+        className="mb-4 h-80 w-80 object-contain"
       />
       <h1 className="mb-6 text-xl font-bold text-text-primary">
         Thông tin cá nhân chưa hoàn thiện
       </h1>
-      <Button
-        variant="outline"
-        className=" rounded-full"
-        onClick={() => setIsEditing(true)}
-        size="lg"
-      >
+      <Button onClick={() => setIsEditing(true)} size="lg">
         Điền thêm thông tin cá nhân
       </Button>
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import noDataImg from "../assets/icons/no-data.png";
+import noDataImg from "../assets/icons/no-data.svg";
 
 function NotFoundPage() {
   return (
@@ -7,7 +7,7 @@ function NotFoundPage() {
       <img
         src={noDataImg}
         alt="Không tìm thấy dữ liệu"
-        className="mb-4 h-40 w-40 object-contain"
+        className="mb-4 h-80 w-80 object-contain"
       />
       <h1 className="mb-6 text-xl font-bold text-text-primary">
         Không tìm thấy dữ liệu

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import noCardImg from "../assets/icons/no-card.png";
+import wallet from "../assets/icons/wallet.svg";
 import { Button } from "@/components/ui/button";
 
 function WalletsPage() {
@@ -8,9 +8,9 @@ function WalletsPage() {
   return (
     <section className="flex min-h-[75vh] flex-col items-center justify-center px-6 text-center">
       <img
-        src={noCardImg}
+        src={wallet}
         alt="Ví tiền"
-        className="mb-4 h-40 w-40 object-contain"
+        className="mb-4 h-80 w-80 object-contain"
       />
       <h1 className="mb-6 text-xl font-bold text-text-primary">
         Chưa có ví hoặc thẻ nào
