@@ -1,5 +1,5 @@
 import { useState } from "react";
-import profile from "../assets/icons/Profile.svg";
+import profile from "../assets/icons/profile.svg";
 import { Button } from "@/components/ui/button";
 
 function ProfilePage() {
