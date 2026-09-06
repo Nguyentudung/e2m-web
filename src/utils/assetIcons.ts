@@ -1,57 +1,56 @@
-const bankIcons = import.meta.glob("/src/assets/icons/banks/*", {
+const bankIcons = import.meta.glob("../assets/icons/banks/*.png", {
   eager: true,
   query: "?url",
   import: "default",
-}) as Record<string, string>;
+});
 
-const ewalletIcons = import.meta.glob("/src/assets/icons/ewallets/*", {
+const ewalletIcons = import.meta.glob("../assets/icons/ewallets/*.png", {
   eager: true,
   query: "?url",
   import: "default",
-}) as Record<string, string>;
+});
 
-const cardIcons = import.meta.glob("/src/assets/icons/cards/*", {
+const cardIcons = import.meta.glob("../assets/icons/cards/*.png", {
   eager: true,
   query: "?url",
   import: "default",
-}) as Record<string, string>;
+});
 
-function getIcon(icons: Record<string, string>, iconName?: string) {
-  if (!iconName) {
+function findIcon(icons: Record<string, unknown>, filename: string) {
+  const entry = Object.entries(icons).find(
+    ([path]) => path.split("/").pop() === filename,
+  );
+
+  return entry?.[1] as string | undefined;
+}
+
+export function getBankIcon(filename: string) {
+  return findIcon(bankIcons, filename);
+}
+
+export function getEwalletIcon(filename: string) {
+  return findIcon(ewalletIcons, filename);
+}
+
+export function getCardIcon(filename: string) {
+  return findIcon(cardIcons, filename);
+}
+
+export function getAssetIcon(
+  type: "cash" | "bank" | "ewallet" | "card",
+  filename?: string,
+) {
+  if (!filename || type === "cash") {
     return undefined;
   }
 
-  const normalizedName = iconName
-    .split("/")
-    .pop()
-    ?.replace(/\.[^/.]+$/, "")
-    .toLowerCase();
-
-  if (!normalizedName) {
-    return undefined;
+  if (type === "bank") {
+    return getBankIcon(filename);
   }
 
-  const entry = Object.entries(icons).find(([path]) => {
-    const fileName = path
-      .split("/")
-      .pop()
-      ?.replace(/\.[^/.]+$/, "")
-      .toLowerCase();
+  if (type === "ewallet") {
+    return getEwalletIcon(filename);
+  }
 
-    return fileName === normalizedName;
-  });
-
-  return entry?.[1];
-}
-
-export function getBankIcon(iconName?: string) {
-  return getIcon(bankIcons, iconName);
-}
-
-export function getEwalletIcon(iconName?: string) {
-  return getIcon(ewalletIcons, iconName);
-}
-
-export function getCardIcon(iconName?: string) {
-  return getIcon(cardIcons, iconName);
+  return getCardIcon(filename);
 }

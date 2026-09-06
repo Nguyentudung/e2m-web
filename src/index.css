@@ -63,42 +63,53 @@ body {
    BASE COLORS
 ======================================== */
 
+/* ========================================
+   BASE COLORS
+======================================== */
+
 @theme {
-  /* BRAND - ELECTRIC SAPPHIRE BLUE PALETTE */
+  /* ========================================
+     BRAND - PURPLE / PRIMARY
+  ======================================== */
 
-  --color-primary-100: #eff6ff;
-  --color-primary-200: #dbeafe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #3b82f6;
-  --color-primary-500: #0066ff;
+  --color-primary-100: #f0efff;
+  --color-primary-200: #e4e2ff;
+  --color-primary-300: #bcb8fa;
+  --color-primary-400: #8982f5;
+  --color-primary-500: #6a63f1;
 
-  --color-secondary-100: #ffc0d3;
-  --color-secondary-200: #e8a4b8;
-  --color-secondary-300: #d68fa4;
-  --color-secondary-400: #fc46ab;
-  --color-secondary-500: #a54162;
+  /* ========================================
+     BRAND - BLUE / SECONDARY
+     Main: #315BFF
+  ======================================== */
 
-  /* GREEN */
+  --color-secondary-100: #eef2ff;
+  --color-secondary-200: #dce4ff;
+  --color-secondary-300: #aebeff;
+  --color-secondary-400: #6382ff;
+  --color-secondary-500: #315bff;
+
+  /* ========================================
+     GREEN
+  ======================================== */
 
   --color-green-base-100: #e0f5e8;
   --color-green-base-200: #31bd65;
   --color-green-base-300: #29ad5a;
   --color-green-base-400: #008535;
 
-  /* RED */
+  /* ========================================
+     RED
+  ======================================== */
 
   --color-red-base-100: #fce4e9;
   --color-red-base-200: #eb4b6d;
   --color-red-base-300: #dd4263;
   --color-red-base-400: #cd2438;
 
-  /* GRAY */
-
-  --color-gray-base-100: #5e5e5e;
-  --color-gray-base-200: #4c4c4c;
-  --color-gray-base-300: #393939;
-
-  /* BASE */
+  /* ========================================
+     BASE
+  ======================================== */
 
   --color-dark-base: #000000;
   --color-light-base: #ffffff;
@@ -131,6 +142,12 @@ body {
 
   --primary-accent: var(--color-primary-500);
   --primary-accent-text: #ffffff;
+
+  /* DISABLED */
+
+  --disabled-background: #f1f1f3;
+  --disabled-border: #e2e2e6;
+  --disabled-text: #a1a1aa;
 
   /* BORDER */
 
@@ -225,6 +242,12 @@ body {
   --primary-accent: var(--color-primary-500);
   --primary-accent-text: #ffffff;
 
+  /* DISABLED */
+
+  --disabled-background: #2a2a2f;
+  --disabled-border: #3a3a40;
+  --disabled-text: #71717a;
+
   /* BORDER */
 
   --border: oklch(1 0 0 / 10%);
@@ -316,13 +339,19 @@ body {
   --color-primary-accent: var(--primary-accent);
   --color-primary-accent-text: var(--primary-accent-text);
 
+  /* DISABLED */
+
+  --color-disabled-background: var(--disabled-background);
+  --color-disabled-border: var(--disabled-border);
+  --color-disabled-text: var(--disabled-text);
+
   /* BORDER */
 
   --color-border: var(--border);
 
   --font-heading: var(--font-sans);
 
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-sans: "Geist Variable", sans-serif;
 
   --color-sidebar-ring: var(--sidebar-ring);
 
@@ -448,12 +477,20 @@ html.dark .bg-primary-accent {
 ======================================== */
 
 /* Light mode: hiện logo sáng, ẩn logo tối */
-.logo-light-image { display: block; }
-.logo-dark-image  { display: none;  }
+.logo-light-image {
+  display: block;
+}
+.logo-dark-image {
+  display: none;
+}
 
 /* Dark mode: ẩn logo sáng, hiện logo tối */
-html.dark .logo-light-image { display: none;  }
-html.dark .logo-dark-image  { display: block; }
+html.dark .logo-light-image {
+  display: none;
+}
+html.dark .logo-dark-image {
+  display: block;
+}
 
 @layer base {
   * {

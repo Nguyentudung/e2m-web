@@ -10,16 +10,20 @@ function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-4 z-50 px-4 md:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-center gap-3">
-        {/* Main navigation */}
+        {/* ================================================== */}
+        {/* MAIN NAVIGATION */}
+        {/* ================================================== */}
+
         <div
           className="
             relative flex h-16 flex-1 items-center
             rounded-full
-            border border-white/10
-            bg-surface/90
+            border-[1.5px] border-light-base
+            dark:border-none
+            bg-background/45
             p-2
-            backdrop-blur-xl
-            shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]
+            backdrop-blur-xs
+            shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]
           "
         >
           {mainItems.map((item) => (
@@ -34,17 +38,18 @@ function BottomNav() {
                   className={[
                     "flex h-12 items-center justify-center rounded-full",
                     "transition-all duration-200 ease-out",
+
                     isActive
                       ? [
                           "gap-1.5 px-4",
-                          "bg-background",
+                          "bg-surface",
                           "text-text-primary",
                           "shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]",
                         ].join(" ")
                       : [
                           "w-12",
                           "text-text-secondary",
-                          "hover:bg-white/5",
+                          "hover:bg-background/50",
                           "hover:text-text-primary",
                         ].join(" "),
                   ].join(" ")}
@@ -56,7 +61,14 @@ function BottomNav() {
                   />
 
                   {isActive && (
-                    <span className="whitespace-nowrap text-[10px] font-semibold leading-none">
+                    <span
+                      className="
+                        whitespace-nowrap
+                        text-[10px]
+                        font-semibold
+                        leading-none
+                      "
+                    >
                       {item.label}
                     </span>
                   )}
@@ -66,7 +78,10 @@ function BottomNav() {
           ))}
         </div>
 
-        {/* Primary action */}
+        {/* ================================================== */}
+        {/* PRIMARY ACTION */}
+        {/* ================================================== */}
+
         {primaryItem && (
           <NavLink
             to={primaryItem.path}
@@ -75,14 +90,14 @@ function BottomNav() {
           >
             <div
               className="
-    flex size-16 items-center justify-center
-    rounded-full
-    bg-primary-accent
-    text-text-primary
-    shadow-[inset_0_1px_2px_rgba(255,255,255,0.12)]
-    transition-transform duration-200
-    active:scale-95
-  "
+                flex size-16 items-center justify-center
+                rounded-full
+                bg-primary-accent
+                text-white
+                shadow-[inset_0_1px_2px_rgba(255,255,255,0.12)]
+                transition-transform duration-200
+                active:scale-95
+              "
             >
               <HugeiconsIcon
                 icon={primaryItem.icon}

@@ -1,77 +1,231 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import wallet from "../assets/icons/wallet.svg";
-import { Button } from "@/components/ui/button";
+import { useNavigation } from "../contexts/NavigationContext";
 
 import CreateWalletPage from "@/components/wallet/CreateWalletPage";
+import WalletInformationPage from "@/components/wallet/WalletInformationPage";
 import BankSelectPage from "@/components/wallet/BankSelectPage";
 import EwalletSelectPage from "@/components/wallet/EwalletSelectPage";
 import CardSelectPage from "@/components/wallet/CardSelectPage";
+import WalletsList from "@/components/wallet/WalletsList";
 
-type WalletPage = "list" | "create" | "bank" | "ewallet" | "card";
+import {
+  createWallet,
+  deleteWallet,
+  getWallets,
+  saveWallet,
+  updateWallet,
+  type Wallet,
+  type WalletType,
+} from "@/types/wallets";
+
+import { getExchangeRates } from "@/services/exchangeRate";
+import type { ExchangeRates } from "@/types/exchangeRate";
+
+type WalletPage =
+  | "list"
+  | "create"
+  | "information"
+  | "bank"
+  | "ewallet"
+  | "card";
+
+type AssetSelectionReturnPage = "create" | "information";
 
 interface SelectedAsset {
-  type: "cash" | "bank" | "ewallet" | "card";
+  type: WalletType;
   id?: string;
   name?: string;
   icon?: string;
 }
 
 function WalletsPage() {
+  // ==================================================
+  // EXCHANGE RATES
+  // ==================================================
+
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getExchangeRates()
+      .then((rates) => {
+        if (!cancelled) {
+          setExchangeRates(rates);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setExchangeRates(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // ==================================================
+  // PAGE
+  // ==================================================
+
   const [currentPage, setCurrentPage] = useState<WalletPage>("list");
+
+  // ==================================================
+  // WALLETS
+  // ==================================================
+
+  const [wallets, setWallets] = useState<Wallet[]>(getWallets);
+
+  // ==================================================
+  // SELECTED ASSET
+  // ==================================================
 
   const [selectedAsset, setSelectedAsset] = useState<SelectedAsset | null>(
     null,
   );
 
+  // ==================================================
+  // SELECTED WALLET
+  // ==================================================
+
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
+
+  // ==================================================
+  // ASSET SELECTION RETURN PAGE
+  // ==================================================
+
+  const [assetSelectionReturnPage, setAssetSelectionReturnPage] =
+    useState<AssetSelectionReturnPage>("create");
+
+  // ==================================================
+  // NAVIGATION
+  // ==================================================
+
+  const { setBottomNavVisible } = useNavigation();
+
+  useEffect(() => {
+    setBottomNavVisible(currentPage === "list");
+
+    return () => {
+      setBottomNavVisible(true);
+    };
+  }, [currentPage, setBottomNavVisible]);
+
+  // ==================================================
+  // CREATE WALLET
+  // ==================================================
+
   const handleCreateWallet = () => {
+    setSelectedWallet(null);
     setSelectedAsset(null);
     setCurrentPage("create");
   };
 
+  // ==================================================
+  // SELECT WALLET
+  // ==================================================
+
+  const handleSelectWallet = (wallet: Wallet) => {
+    setSelectedWallet(wallet);
+
+    setSelectedAsset({
+      type: wallet.type,
+      id: wallet.assetId,
+    });
+
+    setAssetSelectionReturnPage("information");
+    setCurrentPage("information");
+  };
+
+  // ==================================================
+  // BACK TO LIST
+  // ==================================================
+
   const handleBackToList = () => {
+    setSelectedWallet(null);
     setSelectedAsset(null);
     setCurrentPage("list");
   };
 
+  // ==================================================
+  // OPEN BANK SELECTOR
+  // ==================================================
+
   const handleSelectBank = () => {
+    setAssetSelectionReturnPage("create");
     setCurrentPage("bank");
   };
 
+  // ==================================================
+  // OPEN EWALLET SELECTOR
+  // ==================================================
+
   const handleSelectEwallet = () => {
+    setAssetSelectionReturnPage("create");
     setCurrentPage("ewallet");
   };
 
+  // ==================================================
+  // OPEN CARD SELECTOR
+  // ==================================================
+
   const handleSelectCard = () => {
+    setAssetSelectionReturnPage("create");
     setCurrentPage("card");
   };
 
+  // ==================================================
+  // OPEN BANK SELECTOR FROM INFORMATION
+  // ==================================================
+
+  const handleInformationSelectBank = () => {
+    setAssetSelectionReturnPage("information");
+    setCurrentPage("bank");
+  };
+
+  // ==================================================
+  // OPEN EWALLET SELECTOR FROM INFORMATION
+  // ==================================================
+
+  const handleInformationSelectEwallet = () => {
+    setAssetSelectionReturnPage("information");
+    setCurrentPage("ewallet");
+  };
+
+  // ==================================================
+  // OPEN CARD SELECTOR FROM INFORMATION
+  // ==================================================
+
+  const handleInformationSelectCard = () => {
+    setAssetSelectionReturnPage("information");
+    setCurrentPage("card");
+  };
+
+  // ==================================================
+  // RENDER
+  // ==================================================
+
   return (
-    <div className="relative min-h-[75vh] overflow-hidden">
+    <div className="relative min-h-screen overflow-x-hidden">
       {/* ================================================== */}
       {/* WALLET LIST */}
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
           currentPage === "list" ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <section className="flex min-h-[75vh] flex-col items-center justify-center px-6 text-center">
-          <img
-            src={wallet}
-            alt="Ví tiền"
-            className="mb-4 h-80 w-80 object-contain"
-          />
-
-          <h1 className="mb-6 text-xl font-bold text-text-primary">
-            Chưa có ví hoặc thẻ nào
-          </h1>
-
-          <Button onClick={handleCreateWallet} size="lg">
-            + Tạo ví mới ngay
-          </Button>
-        </section>
+        <WalletsList
+          wallets={wallets}
+          exchangeRates={exchangeRates}
+          onCreateWallet={handleCreateWallet}
+          onSelectWallet={handleSelectWallet}
+        />
       </div>
 
       {/* ================================================== */}
@@ -79,7 +233,7 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
           currentPage === "create"
             ? "translate-x-0"
             : currentPage === "list"
@@ -94,13 +248,73 @@ function WalletsPage() {
           onSelectEwallet={handleSelectEwallet}
           onSelectCard={handleSelectCard}
           onSave={(data) => {
-            console.log("Wallet data:", data);
+            const newWallet = createWallet(data);
 
-            // Sau này lưu LocalStorage / Supabase ở đây.
+            saveWallet(newWallet);
 
+            setWallets((currentWallets) => [...currentWallets, newWallet]);
+
+            setSelectedAsset(null);
             setCurrentPage("list");
           }}
         />
+      </div>
+
+      {/* ================================================== */}
+      {/* WALLET INFORMATION */}
+      {/* ================================================== */}
+
+      <div
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+          currentPage === "information"
+            ? "translate-x-0"
+            : currentPage === "list"
+              ? "translate-x-full"
+              : "-translate-x-full"
+        }`}
+      >
+        {selectedWallet && (
+          <WalletInformationPage
+            wallet={selectedWallet}
+            selectedAsset={selectedAsset}
+            onBack={handleBackToList}
+            onSelectBank={handleInformationSelectBank}
+            onSelectEwallet={handleInformationSelectEwallet}
+            onSelectCard={handleInformationSelectCard}
+            onSave={(data) => {
+              const updatedWallet: Wallet = {
+                ...selectedWallet,
+                ...data,
+                updatedAt: new Date().toISOString(),
+              };
+
+              updateWallet(updatedWallet);
+
+              setWallets((currentWallets) =>
+                currentWallets.map((wallet) =>
+                  wallet.id === updatedWallet.id ? updatedWallet : wallet,
+                ),
+              );
+
+              setSelectedWallet(null);
+              setSelectedAsset(null);
+              setCurrentPage("list");
+            }}
+            onDelete={() => {
+              deleteWallet(selectedWallet.id);
+
+              setWallets((currentWallets) =>
+                currentWallets.filter(
+                  (wallet) => wallet.id !== selectedWallet.id,
+                ),
+              );
+
+              setSelectedWallet(null);
+              setSelectedAsset(null);
+              setCurrentPage("list");
+            }}
+          />
+        )}
       </div>
 
       {/* ================================================== */}
@@ -108,12 +322,12 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
           currentPage === "bank" ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <BankSelectPage
-          onBack={() => setCurrentPage("create")}
+          onBack={() => setCurrentPage(assetSelectionReturnPage)}
           onSelect={(bank) => {
             setSelectedAsset({
               type: "bank",
@@ -122,7 +336,7 @@ function WalletsPage() {
               icon: bank.icon,
             });
 
-            setCurrentPage("create");
+            setCurrentPage(assetSelectionReturnPage);
           }}
         />
       </div>
@@ -132,12 +346,12 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
           currentPage === "ewallet" ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <EwalletSelectPage
-          onBack={() => setCurrentPage("create")}
+          onBack={() => setCurrentPage(assetSelectionReturnPage)}
           onSelect={(ewallet) => {
             setSelectedAsset({
               type: "ewallet",
@@ -146,7 +360,7 @@ function WalletsPage() {
               icon: ewallet.icon,
             });
 
-            setCurrentPage("create");
+            setCurrentPage(assetSelectionReturnPage);
           }}
         />
       </div>
@@ -156,12 +370,12 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
           currentPage === "card" ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <CardSelectPage
-          onBack={() => setCurrentPage("create")}
+          onBack={() => setCurrentPage(assetSelectionReturnPage)}
           onSelect={(card) => {
             setSelectedAsset({
               type: "card",
@@ -170,7 +384,7 @@ function WalletsPage() {
               icon: card.icon,
             });
 
-            setCurrentPage("create");
+            setCurrentPage(assetSelectionReturnPage);
           }}
         />
       </div>
