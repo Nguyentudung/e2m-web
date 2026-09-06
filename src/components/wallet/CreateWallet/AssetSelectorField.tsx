@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Building03Icon,
@@ -16,12 +17,48 @@ interface AssetSelectorFieldProps {
   onSelect: () => void;
 }
 
+// Hàm hỗ trợ ghép nối đường dẫn tới thư mục src/assets/icons/
+function getAssetIconUrl(
+  type: AssetType,
+  iconFileName?: string,
+): string | null {
+  if (!iconFileName) return null;
+
+  // Nếu iconFileName đã là đường dẫn đầy đủ hoặc link URL thì giữ nguyên
+  if (iconFileName.startsWith("data:") || iconFileName.startsWith("http")) {
+    return iconFileName;
+  }
+
+  // Xác định tên thư mục con trong src/assets/icons/ dựa theo loại tài sản
+  const folder =
+    type === "bank" ? "banks" : type === "ewallet" ? "ewallets" : "card";
+
+  try {
+    // Sử dụng new URL với Vite để tự động resolve đường dẫn trong src/assets/
+    return new URL(
+      `../../../assets/icons/${folder}/${iconFileName}`,
+      import.meta.url,
+    ).href;
+  } catch (error) {
+    console.error("Lỗi tải icon:", error);
+    return null;
+  }
+}
+
 function AssetSelectorField({
   type,
   selectedAsset,
   selectedAssetIcon,
   onSelect,
 }: AssetSelectorFieldProps) {
+  const [hasImageError, setHasImageError] = useState(false);
+
+  // 1. Lấy tên file ảnh từ selectedAssetIcon hoặc selectedAsset.icon
+  const iconFileName = selectedAssetIcon || selectedAsset?.icon;
+
+  // 2. Ghép nối đường dẫn tới src/assets/icons/{banks|ewallets|card}/{iconFileName}
+  const imageSrc = getAssetIconUrl(type, iconFileName);
+
   const label =
     type === "bank"
       ? "Ngân hàng"
@@ -29,7 +66,7 @@ function AssetSelectorField({
         ? "Ví điện tử"
         : "Loại thẻ";
 
-  const icon =
+  const fallbackIcon =
     type === "bank"
       ? Building03Icon
       : type === "ewallet"
@@ -65,15 +102,16 @@ function AssetSelectorField({
             bg-background
           "
         >
-          {selectedAssetIcon ? (
+          {imageSrc && !hasImageError ? (
             <img
-              src={selectedAssetIcon}
+              src={imageSrc}
               alt={selectedAsset?.name ?? ""}
               className="size-7 object-contain"
+              onError={() => setHasImageError(true)}
             />
           ) : (
             <HugeiconsIcon
-              icon={icon}
+              icon={fallbackIcon}
               size={21}
               strokeWidth={1.8}
               className="text-text-secondary"
