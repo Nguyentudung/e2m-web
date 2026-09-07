@@ -118,24 +118,18 @@ function WalletsList({
         </Button>
       </header>
 
-      <div className="px-4 pb-8">
+      <div className="px-4 pb-32">
         {/* ================================================== */}
         {/* TOTAL ASSETS CARD */}
         {/* ================================================== */}
 
-        <section className="relative mb-8 overflow-hidden rounded-[28px] bg-slate-100 p-6 dark:bg-slate-900">
-          {/* Dải màu Radial Gradient: Từ màu secondary ở đỉnh giữa tỏa xuống màu xám lạnh */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_130%_85%_at_50%_0%,_var(--tw-color-secondary-300,_#c7c3ff)_0%,_var(--tw-color-secondary-100,_#eceaff)_45%,_#f1f5f9_100%)] dark:bg-[radial-gradient(ellipse_130%_85%_at_50%_0%,_var(--tw-color-secondary-400,_#938cf3)_0%,_var(--tw-color-secondary-200,_#c7c3ff)_40%,_#0f172a_100%)]"
-            aria-hidden="true"
-          />
-
+        <section className="wallet-total-card relative mb-8 overflow-hidden rounded-[28px] p-6">
           {/* Logo in ở góc dưới bên phải */}
           <img
             src={logo}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-5 -right-5 size-36 origin-bottom-right rotate-[12deg] object-contain opacity-30 mix-blend-multiply dark:mix-blend-screen"
+            className="pointer-events-none absolute -bottom-5 -right-5 size-36 origin-bottom-right rotate-[12deg] object-contain opacity-[var(--wallet-logo-opacity)] dark:mix-blend-screen"
           />
 
           {/* Nội dung chữ */}
@@ -222,7 +216,7 @@ function WalletsList({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectWallet(item)}
-                    className="w-full overflow-hidden rounded-[24px] bg-secondary-200 p-0 text-left transition active:scale-[0.99]"
+                    className="wallet-card w-full overflow-hidden rounded-[24px] p-0 text-left transition active:scale-[0.99]"
                   >
                     {/* LỚP 1 — LOẠI TÀI SẢN */}
                     <div className="flex h-8 items-center justify-center px-4">
@@ -232,7 +226,7 @@ function WalletsList({
                     </div>
 
                     {/* LỚP 2 — NỘI DUNG */}
-                    <div className="rounded-[24px] bg-surface px-3 pb-4 pt-4">
+                    <div className="wallet-card-surface rounded-[24px] px-3 pb-4 pt-4">
                       {/* LỚP 3 — ASSET CARD */}
                       <div className="rounded-[20px] border-2 border-dashed border-border bg-background px-4 py-3">
                         <div className="flex items-center gap-3">

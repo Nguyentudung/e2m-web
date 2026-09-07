@@ -149,6 +149,17 @@ body {
   --disabled-border: #e2e2e6;
   --disabled-text: #a1a1aa;
 
+  /* WALLET */
+
+  --wallet-card-bg: #dce4ff;
+  --wallet-card-surface: #f5f5f5;
+
+  --wallet-total-start: #c7c3ff;
+  --wallet-total-mid: #eceaff;
+  --wallet-total-end: #f1f5f9;
+
+  --wallet-logo-opacity: 0.3;
+
   /* BORDER */
 
   --border: oklch(0.922 0 0);
@@ -247,6 +258,17 @@ body {
   --disabled-background: #2a2a2f;
   --disabled-border: #3a3a40;
   --disabled-text: #71717a;
+
+  /* WALLET */
+
+  --wallet-card-bg: #20242c;
+  --wallet-card-surface: #15181d;
+
+  --wallet-total-start: #55517f;
+  --wallet-total-mid: #303345;
+  --wallet-total-end: #15181d;
+
+  --wallet-logo-opacity: 0.16;
 
   /* BORDER */
 
@@ -490,6 +512,27 @@ html.dark .logo-light-image {
 }
 html.dark .logo-dark-image {
   display: block;
+}
+
+/* ========================================
+   WALLET COMPONENTS
+======================================== */
+
+.wallet-total-card {
+  background: radial-gradient(
+    ellipse 130% 85% at 50% 0%,
+    var(--wallet-total-start) 0%,
+    var(--wallet-total-mid) 45%,
+    var(--wallet-total-end) 100%
+  );
+}
+
+.wallet-card {
+  background-color: var(--wallet-card-bg);
+}
+
+.wallet-card-surface {
+  background-color: var(--wallet-card-surface);
 }
 
 @layer base {
