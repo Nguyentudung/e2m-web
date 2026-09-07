@@ -298,14 +298,14 @@ function WalletInformationPage({
 
       <div
         className="
-          shrink-0
-          bg-background
-          px-4
-          pt-3
-          pb-[calc(12px+env(safe-area-inset-bottom))]
-          sm:px-8
-          sm:pb-4
-        "
+    shrink-0
+    bg-background
+    px-4
+    pt-3
+    pb-[calc(12px+env(safe-area-inset-bottom))]
+    sm:px-8
+    sm:pb-4
+  "
       >
         <div className="mx-auto w-full max-w-2xl">
           <div className="flex items-center gap-3">
