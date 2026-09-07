@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 
 import AppLayout from "./layouts/AppLayout";
 
@@ -116,7 +122,11 @@ function AppRoutes() {
         {/* TRANG CHÍNH */}
         {/* ================================================== */}
 
-        <Route path="/" element={<HomePage />} />
+        {/* "/" giờ chỉ để redirect sang "/home", không tự render HomePage nữa,
+            tránh việc "/" vừa là 1 route thật vừa là prefix của mọi route khác */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
+
+        <Route path="/home" element={<HomePage />} />
 
         <Route path="/reports" element={<ReportsPage />} />
 

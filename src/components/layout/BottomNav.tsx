@@ -17,15 +17,16 @@ function BottomNav() {
 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
+  // path "/" là prefix của MỌI đường dẫn, nên so khớp tuyệt đối riêng cho nó,
+  // các path khác vẫn cho phép khớp route con (vd "/wallets/history" -> tab "Ví")
   const activeIndex = mainItems.findIndex((item) =>
     location.pathname.startsWith(item.path),
   );
 
   // --- "Adjust state during render" pattern (theo react.dev) ---
-  // Theo dõi pathname trước đó bằng state, so sánh ngay trong lúc render.
-  // Khi phát hiện pathname vừa đổi VÀ đang có một lần kéo đang chờ route
-  // cập nhật khớp, tắt drag NGAY trong render này (không qua effect),
-  // tránh render thừa/nhấp nháy.
+  // So sánh pathname hiện tại với pathname ở lần render trước, ngay trong
+  // thân component (không dùng useEffect), để tắt trạng thái kéo đúng lúc
+  // route thật sự đổi khớp, tránh render thừa/nhấp nháy.
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   let renderDragIndex = dragIndex;
 
@@ -36,7 +37,7 @@ function BottomNav() {
       location.pathname.startsWith(mainItems[dragIndex].path)
     ) {
       setDragIndex(null);
-      renderDragIndex = null; // để chính render hiện tại cũng phản ánh ngay, không đợi thêm 1 lượt
+      renderDragIndex = null;
     }
   }
 
@@ -85,13 +86,12 @@ function BottomNav() {
     setDragIndex(found);
 
     if (location.pathname.startsWith(targetPath)) {
-      // Thả trúng tab hiện tại -> route không đổi -> tắt drag ngay,
-      // vì sẽ không có lần "pathname khác prevPathname" nào xảy ra để tự tắt hộ
+      // Thả trúng tab hiện tại -> route không đổi -> tắt drag ngay
       setDragIndex(null);
     } else {
       navigate(targetPath);
-      // Không tắt drag ở đây. Đoạn so sánh prevPathname phía trên
-      // sẽ tự tắt drag đúng lúc pathname thật sự đổi khớp.
+      // Không tắt drag ở đây - khối so sánh prevPathname phía trên
+      // sẽ tự tắt đúng lúc pathname thật sự đổi khớp.
     }
   };
 
@@ -181,7 +181,9 @@ function BottomNav() {
               className="
                 flex size-16 items-center justify-center
                 rounded-full
-                bg-primary-accent
+                backdrop-blur-xs
+                border-[1.5px] border-light-base
+                bg-primary-accent/85
                 text-white
                 shadow-[inset_0_1px_2px_rgba(255,255,255,0.12)]
               "

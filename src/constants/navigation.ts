@@ -9,7 +9,7 @@ import {
 export const navigationItems = [
   {
     label: "Trang chính",
-    path: "/",
+    path: "/home",
     icon: Home01Icon,
     isPrimary: false,
   },
