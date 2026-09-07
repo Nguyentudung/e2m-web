@@ -269,14 +269,22 @@ function CreateWalletPage({
       </form>
 
       {/* ================= ACTION ================= */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-4 pb-4 sm:px-8">
+      <div
+        className="
+    shrink-0
+    bg-background
+    px-4
+    pt-3
+    pb-[calc(12px+env(safe-area-inset-bottom))]
+    sm:px-8
+    sm:pb-4
+  "
+      >
         <div className="mx-auto w-full max-w-2xl">
-          <div className="pointer-events-auto">
-            <CreateWalletActions
-              disabled={!balance || (type !== "cash" && !selectedAsset?.id)}
-              onCancel={onBack}
-            />
-          </div>
+          <CreateWalletActions
+            disabled={!balance || (type !== "cash" && !selectedAsset?.id)}
+            onCancel={onBack}
+          />
         </div>
       </div>
     </section>
