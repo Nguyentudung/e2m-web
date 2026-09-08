@@ -110,7 +110,7 @@ function BottomNav() {
           className=" 
             relative flex h-16 flex-1 items-center justify-around 
             rounded-full 
-            border-[1.5px] border-light-base 
+            border-[1.5px] border-dark-base 
             dark:border-none 
             bg-background/45 
             p-0.5
@@ -135,7 +135,11 @@ function BottomNav() {
                 {isDisplayed && (
                   <motion.div
                     layoutId="activeTabPill"
-                    className="absolute inset-0 rounded-full bg-primary-400 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]"
+                    // Đổi từ "absolute inset-0" (cao bằng cả ô) sang chiều cao cố định,
+                    // canh giữa theo chiều dọc bằng top-1/2 + -translate-y-1/2.
+                    // Nhờ vậy dù ô tab rộng hay hẹp theo từng màn hình, pill luôn
+                    // "dẹt" (rộng hơn cao) thay vì bị vuông/tròn trên màn hình nhỏ.
+                    className="absolute left-0 right-0 top-1/2 h-11 -translate-y-1/2 rounded-full bg-primary-400 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]"
                     animate={{ scale: isDisplayingDrag ? 1.08 : 1 }}
                     transition={{
                       type: "spring",
