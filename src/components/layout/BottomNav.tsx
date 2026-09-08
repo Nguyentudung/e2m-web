@@ -17,16 +17,10 @@ function BottomNav() {
 
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  // path "/" là prefix của MỌI đường dẫn, nên so khớp tuyệt đối riêng cho nó,
-  // các path khác vẫn cho phép khớp route con (vd "/wallets/history" -> tab "Ví")
   const activeIndex = mainItems.findIndex((item) =>
     location.pathname.startsWith(item.path),
   );
 
-  // --- "Adjust state during render" pattern (theo react.dev) ---
-  // So sánh pathname hiện tại với pathname ở lần render trước, ngay trong
-  // thân component (không dùng useEffect), để tắt trạng thái kéo đúng lúc
-  // route thật sự đổi khớp, tránh render thừa/nhấp nháy.
   const [prevPathname, setPrevPathname] = useState(location.pathname);
   let renderDragIndex = dragIndex;
 
@@ -86,12 +80,9 @@ function BottomNav() {
     setDragIndex(found);
 
     if (location.pathname.startsWith(targetPath)) {
-      // Thả trúng tab hiện tại -> route không đổi -> tắt drag ngay
       setDragIndex(null);
     } else {
       navigate(targetPath);
-      // Không tắt drag ở đây - khối so sánh prevPathname phía trên
-      // sẽ tự tắt đúng lúc pathname thật sự đổi khớp.
     }
   };
 
@@ -108,9 +99,9 @@ function BottomNav() {
           onPointerUp={handlePointerUp}
           onPointerCancel={() => setDragIndex(null)}
           className=" 
-            relative flex h-16 flex-1 items-center justify-around 
+            relative flex h-16 flex-1 items-center justify-center gap-2
             rounded-full 
-            border-[1.5px] border-dark-base 
+            border-[1.5px] border-light-base 
             dark:border-none 
             bg-background/45 
             p-0.5
@@ -130,16 +121,14 @@ function BottomNav() {
                 type="button"
                 aria-label={item.label}
                 onPointerDown={handlePointerDown(index)}
-                className="relative flex h-full flex-1 items-center justify-center"
+                // w-20 (80px) > h-14 (56px) -> rounded-full sẽ ra hình con nhộng,
+                // không phải hình tròn. Đừng để w = h.
+                className="relative flex h-14 w-20 shrink-0 items-center justify-center"
               >
                 {isDisplayed && (
                   <motion.div
                     layoutId="activeTabPill"
-                    // Đổi từ "absolute inset-0" (cao bằng cả ô) sang chiều cao cố định,
-                    // canh giữa theo chiều dọc bằng top-1/2 + -translate-y-1/2.
-                    // Nhờ vậy dù ô tab rộng hay hẹp theo từng màn hình, pill luôn
-                    // "dẹt" (rộng hơn cao) thay vì bị vuông/tròn trên màn hình nhỏ.
-                    className="absolute left-0 right-0 top-1/2 h-11 -translate-y-1/2 rounded-full bg-primary-400 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]"
+                    className="absolute inset-0 rounded-full bg-primary-400 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]"
                     animate={{ scale: isDisplayingDrag ? 1.08 : 1 }}
                     transition={{
                       type: "spring",
