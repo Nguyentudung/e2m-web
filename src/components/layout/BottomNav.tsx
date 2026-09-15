@@ -26,6 +26,7 @@ function BottomNav() {
 
   if (location.pathname !== prevPathname) {
     setPrevPathname(location.pathname);
+
     if (
       dragIndex !== null &&
       location.pathname.startsWith(mainItems[dragIndex].path)
@@ -44,8 +45,11 @@ function BottomNav() {
   ): number | null => {
     for (let i = 0; i < itemRefs.current.length; i++) {
       const el = itemRefs.current[i];
+
       if (!el) continue;
+
       const rect = el.getBoundingClientRect();
+
       if (
         clientX >= rect.left &&
         clientX <= rect.right &&
@@ -55,6 +59,7 @@ function BottomNav() {
         return i;
       }
     }
+
     return null;
   };
 
@@ -66,7 +71,9 @@ function BottomNav() {
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (dragIndex === null) return;
+
     const found = findIndexAtPoint(e.clientX, e.clientY);
+
     if (found !== null && found !== dragIndex) {
       setDragIndex(found);
     }
@@ -74,7 +81,9 @@ function BottomNav() {
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (dragIndex === null) return;
+
     const found = findIndexAtPoint(e.clientX, e.clientY) ?? dragIndex;
+
     const targetPath = mainItems[found].path;
 
     setDragIndex(found);
@@ -87,8 +96,20 @@ function BottomNav() {
   };
 
   return (
-    <nav className="fixed inset-x-0 bottom-4 z-50 px-4 md:hidden">
-      <div className="mx-auto flex max-w-lg items-center justify-center gap-3">
+    <nav
+      className="
+        fixed inset-x-0 bottom-4 z-50
+        px-3 sm:px-4
+        md:hidden
+      "
+    >
+      <div
+        className="
+          mx-auto flex w-full max-w-lg min-w-0
+          items-center justify-center
+          gap-[clamp(6px,2vw,12px)]
+        "
+      >
         {/* ================================================== */}
         {/* MAIN NAVIGATION */}
         {/* ================================================== */}
@@ -98,20 +119,34 @@ function BottomNav() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={() => setDragIndex(null)}
-          className=" 
-            relative flex h-16 flex-1 items-center justify-center gap-2
-            rounded-full 
-            border-[1.5px] border-light-base 
-            dark:border-none 
-            bg-background/45 
-            p-0.5
-            backdrop-blur-xs 
-            shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] 
-            touch-none select-none
+          className="
+            relative flex min-w-0 flex-1
+            items-center justify-center
+            overflow-hidden
+
+            h-[clamp(52px,15vw,64px)]
+            gap-[clamp(2px,1vw,8px)]
+
+            rounded-full
+
+            /* Nền: rất trong, tự đổi theo theme qua --surface */
+            bg-surface/15
+            border-[0.5px] border-white/80
+            dark:border-black/80
+
+            p-[clamp(2px,0.7vw,4px)]
+            backdrop-blur-[2px]
+
+            /* Inset shadow: cùng màu với nền (--surface), không còn trắng */
+            shadow-[inset_0_0_8px_1px_color-mix(in_srgb,var(--surface)_60%,transparent)]
+
+            touch-none
+            select-none
           "
         >
           {mainItems.map((item, index) => {
             const isDisplayed = index === displayIndex;
+
             return (
               <button
                 key={item.path}
@@ -121,15 +156,32 @@ function BottomNav() {
                 type="button"
                 aria-label={item.label}
                 onPointerDown={handlePointerDown(index)}
-                // w-20 (80px) > h-14 (56px) -> rounded-full sẽ ra hình con nhộng,
-                // không phải hình tròn. Đừng để w = h.
-                className="relative flex h-14 w-20 shrink-0 items-center justify-center"
+                className="
+                  relative
+                  flex
+                  min-w-0
+                  shrink
+                  basis-0
+                  flex-1
+                  items-center
+                  justify-center
+
+                  h-[clamp(44px,12vw,56px)]
+                  rounded-full
+                "
               >
                 {isDisplayed && (
                   <motion.div
                     layoutId="activeTabPill"
-                    className="absolute inset-0 rounded-full bg-primary-400 shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]"
-                    animate={{ scale: isDisplayingDrag ? 1.08 : 1 }}
+                    className="
+                      absolute inset-0
+                      rounded-full
+                      bg-primary-400
+                      shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]
+                    "
+                    animate={{
+                      scale: isDisplayingDrag ? 1.08 : 1,
+                    }}
                     transition={{
                       type: "spring",
                       stiffness: 380,
@@ -140,10 +192,13 @@ function BottomNav() {
 
                 <div
                   className={[
-                    "relative z-10 flex h-full w-full items-center justify-center",
+                    "relative z-10 flex h-full w-full",
+                    "items-center justify-center",
+                    "rounded-full",
                     "transition-colors duration-200",
+
                     isDisplayed
-                      ? "text-light-base"
+                      ? "text-white"
                       : "text-text-secondary hover:text-text-primary",
                   ].join(" ")}
                 >
@@ -151,6 +206,9 @@ function BottomNav() {
                     icon={item.icon}
                     size={24}
                     strokeWidth={isDisplayed ? 2.4 : 1.8}
+                    className="
+                      size-[clamp(20px,5.5vw,24px)]
+                    "
                   />
                 </div>
               </button>
@@ -167,17 +225,29 @@ function BottomNav() {
             type="button"
             aria-label={primaryItem.label}
             onClick={() => navigate(primaryItem.path)}
-            className="shrink-0"
+            className="
+              shrink-0
+              rounded-full
+            "
           >
             <motion.div
               whileTap={{ scale: 0.95 }}
               className="
-                flex size-16 items-center justify-center
+                flex
+                size-[clamp(52px,15vw,64px)]
+                items-center
+                justify-center
+
                 rounded-full
-                backdrop-blur-xs
-                border-[1.5px] border-light-base
+                border-[1.5px]
+                border-light-base
+                dark:border-dark-base
+
                 bg-primary-accent/85
                 text-white
+
+                backdrop-blur-xs
+
                 shadow-[inset_0_1px_2px_rgba(255,255,255,0.12)]
               "
             >
@@ -185,6 +255,9 @@ function BottomNav() {
                 icon={primaryItem.icon}
                 size={30}
                 strokeWidth={2.2}
+                className="
+                  size-[clamp(24px,7vw,30px)]
+                "
               />
             </motion.div>
           </button>
