@@ -100,7 +100,7 @@ function BottomNav() {
   return (
     <nav
       className="
-        fixed inset-x-0 bottom-4 z-50
+        fixed inset-x-0 bottom-4 z-40
         px-3 sm:px-4
         md:hidden
       "
@@ -191,8 +191,9 @@ function BottomNav() {
                     }}
                     transition={{
                       type: "spring",
-                      stiffness: 380,
-                      damping: 30,
+                      stiffness: isDisplayingDrag ? 340 : 280,
+                      damping: isDisplayingDrag ? 24 : 26,
+                      mass: 0.7,
                     }}
                   />
                 )}
