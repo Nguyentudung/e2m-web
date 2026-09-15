@@ -123,11 +123,12 @@ function BottomNav() {
           onPointerCancel={() => setDragIndex(null)}
           className="
             relative flex min-w-0 flex-1
-            items-center justify-center
+            items-center justify-between
             overflow-hidden
 
-            h-[clamp(52px,15vw,64px)]
-            gap-[clamp(2px,1vw,8px)]
+            h-14 sm:h-16
+            gap-1.5
+            p-1.5
 
             rounded-full
 
@@ -136,8 +137,6 @@ function BottomNav() {
 
             /* Dark theme → light taskbar */
             dark:bg-light-base
-
-            p-[clamp(2px,0.7vw,4px)]
 
             shadow-[0_4px_18px_rgba(0,0,0,0.14)]
             dark:shadow-[0_4px_18px_rgba(0,0,0,0.32)]
@@ -173,7 +172,7 @@ function BottomNav() {
                   items-center
                   justify-center
 
-                  h-[clamp(44px,12vw,56px)]
+                  h-full
                   rounded-full
                 "
               >
@@ -188,7 +187,7 @@ function BottomNav() {
                       shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]
                     "
                     animate={{
-                      scale: isDisplayingDrag ? 1.08 : 1,
+                      scale: isDisplayingDrag ? 1.05 : 1,
                     }}
                     transition={{
                       type: "spring",
@@ -238,7 +237,7 @@ function BottomNav() {
               whileTap={{ scale: 0.95 }}
               className="
                 flex
-                size-[clamp(52px,15vw,64px)]
+                size-14 sm:size-16
                 items-center
                 justify-center
 
@@ -258,10 +257,10 @@ function BottomNav() {
             >
               <HugeiconsIcon
                 icon={primaryItem.icon}
-                size={30}
+                size={28}
                 strokeWidth={2.2}
                 className="
-                  size-[clamp(24px,7vw,30px)]
+                  size-7
                 "
               />
             </motion.div>
