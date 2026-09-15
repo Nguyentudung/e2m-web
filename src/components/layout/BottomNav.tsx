@@ -4,8 +4,10 @@ import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { navigationItems } from "../../constants/navigation";
+import { useIsDark } from "../../hooks/useIsDark";
 
 function BottomNav() {
+  const isDark = useIsDark();
   const mainItems = navigationItems.filter((item) => !item.isPrimary);
   const primaryItem = navigationItems.find((item) => item.isPrimary);
 
@@ -129,16 +131,16 @@ function BottomNav() {
 
             rounded-full
 
-            /* Nền: rất trong, tự đổi theo theme qua --surface */
-            bg-surface/15
-            border-[0.5px] border-white/80
-            dark:border-black/80
+            /* Light theme → dark taskbar */
+            bg-dark-base
+
+            /* Dark theme → light taskbar */
+            dark:bg-light-base
 
             p-[clamp(2px,0.7vw,4px)]
-            backdrop-blur-[2px]
 
-            /* Inset shadow: cùng màu với nền (--surface), không còn trắng */
-            shadow-[inset_0_0_8px_1px_color-mix(in_srgb,var(--surface)_60%,transparent)]
+            shadow-[0_4px_18px_rgba(0,0,0,0.14)]
+            dark:shadow-[0_4px_18px_rgba(0,0,0,0.32)]
 
             touch-none
             select-none
@@ -146,6 +148,11 @@ function BottomNav() {
         >
           {mainItems.map((item, index) => {
             const isDisplayed = index === displayIndex;
+            const iconColor = isDisplayed
+              ? "#ffffff"
+              : isDark
+                ? "rgba(0, 0, 0, 1)"
+                : "rgba(255, 255, 255, 1)";
 
             return (
               <button
@@ -177,6 +184,7 @@ function BottomNav() {
                       absolute inset-0
                       rounded-full
                       bg-primary-400
+
                       shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]
                     "
                     animate={{
@@ -191,24 +199,20 @@ function BottomNav() {
                 )}
 
                 <div
-                  className={[
-                    "relative z-10 flex h-full w-full",
-                    "items-center justify-center",
-                    "rounded-full",
-                    "transition-colors duration-200",
-
-                    isDisplayed
-                      ? "text-white"
-                      : "text-text-secondary hover:text-text-primary",
-                  ].join(" ")}
+                  className="
+                    relative z-10
+                    flex h-full w-full
+                    items-center justify-center
+                    rounded-full
+                    transition-colors duration-200
+                  "
                 >
                   <HugeiconsIcon
                     icon={item.icon}
                     size={24}
+                    color={iconColor}
                     strokeWidth={isDisplayed ? 2.4 : 1.8}
-                    className="
-                      size-[clamp(20px,5.5vw,24px)]
-                    "
+                    className="size-[clamp(20px,5.5vw,24px)] transition-colors duration-200"
                   />
                 </div>
               </button>
@@ -239,6 +243,7 @@ function BottomNav() {
                 justify-center
 
                 rounded-full
+
                 border-[1.5px]
                 border-light-base
                 dark:border-dark-base
