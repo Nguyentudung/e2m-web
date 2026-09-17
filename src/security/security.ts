@@ -52,3 +52,8 @@ export function getSecurityStatus(): SecuritySettingsWithoutSecret {
 }
 
 export const AUTO_LOCK_TIMEOUT = 5 * 60 * 1000;
+export const DEFAULT_AUTO_LOCK_MINUTES = 5;
+
+export function getAutoLockTimeout(settings: SecuritySettings | null = getSecuritySettings()) {
+  return (settings?.autoLockMinutes ?? DEFAULT_AUTO_LOCK_MINUTES) * 60 * 1000;
+}

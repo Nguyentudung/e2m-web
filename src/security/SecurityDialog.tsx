@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowLeft01Icon,
   FingerPrintIcon,
   ShieldCheckIcon,
 } from "@hugeicons/core-free-icons";
@@ -17,20 +16,26 @@ import { Button } from "@/components/ui/button";
 import { PinInput } from "./PinInput";
 import { createPinSecret, isValidPin } from "./pin";
 import { registerBiometric, supportsBiometric } from "./biometric";
-import { getSecuritySettings, saveSecuritySettings } from "./security";
+import {
+  DEFAULT_AUTO_LOCK_MINUTES,
+  getSecuritySettings,
+  saveSecuritySettings,
+} from "./security";
 import { useSecurity } from "./useSecurity";
 
-type Step = "overview" | "setup" | "confirm" | "biometric" | "verify" | "new-pin" | "new-confirm";
+type Step = "overview" | "setup" | "confirm" | "biometric" | "timeout" | "verify" | "new-pin" | "new-confirm";
+export type SecurityEntryPoint = "overview" | "biometric" | "timeout";
 
 interface SecurityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialStep?: SecurityEntryPoint;
 }
 
-export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
+export function SecurityDialog({ open, onOpenChange, initialStep = "overview" }: SecurityDialogProps) {
   const { settings, refresh, unlockWithPin } = useSecurity();
   const [step, setStep] = useState<Step>(() =>
-    settings?.enabled ? "overview" : "setup",
+    settings?.enabled ? initialStep : initialStep === "overview" ? "setup" : "setup",
   );
   const [pin, setPin] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -102,7 +107,7 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
       refresh();
       setStep("overview");
     } catch {
-      setError("Không thể bật sinh trắc học. Bạn vẫn có thể sử dụng mã PIN e2m.");
+      setError("Không thể bật sinh trắc học. Bạn vẫn có thể sử dụng mã PIN.");
     } finally {
       setBusy(false);
     }
@@ -146,11 +151,11 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
         <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-2.5">
           <div className="space-y-1 text-center">
             <h2 className="text-lg font-bold text-text-primary">
-              {isVerify ? "Xác thực để tiếp tục" : isConfirm ? "Xác nhận mã PIN" : "Tạo mã PIN e2m"}
+              {isVerify ? "Xác thực để tiếp tục" : isConfirm ? "Xác nhận mã PIN" : "Tạo mã PIN"}
             </h2>
             <p className="text-sm leading-6 text-text-secondary">
               {isVerify
-                ? "Nhập mã PIN e2m hiện tại."
+                ? "Nhập mã PIN hiện tại."
                 : isConfirm
                   ? "Nhập lại 6 chữ số để xác nhận mã PIN."
                   : "Tạo mã PIN 6 chữ số để bảo vệ dữ liệu của bạn."}
@@ -167,6 +172,11 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
           >
             {busy ? "Đang xử lý..." : isVerify ? "Xác nhận" : isConfirm ? "Hoàn tất" : "Tiếp tục"}
           </Button>
+          {isVerify && (
+            <Button variant="outline" onClick={() => setStep("overview")} className="h-11 w-full rounded-full">
+              Quay lại
+            </Button>
+          )}
         </div>
       </>
     );
@@ -185,43 +195,68 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
         {step === "overview" && settings?.enabled ? (
           <>
             <DrawerHeader className="p-0 text-left">
-              <DrawerTitle>Khóa bảo mật</DrawerTitle>
-              <DrawerDescription>Đã bật bảo vệ cho e2m.</DrawerDescription>
+              <DrawerTitle>Bảo mật</DrawerTitle>
+              <DrawerDescription>Quản lý các tùy chọn bảo vệ ứng dụng.</DrawerDescription>
             </DrawerHeader>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-sm">
-                <span className="font-medium">Sinh trắc học</span>
-                <span className="text-text-secondary">{settings.biometricEnabled ? "Đã bật" : "Chưa bật"}</span>
+                <span className="font-medium">Mã PIN</span>
+                <span className="text-text-secondary">Đã bật</span>
               </div>
-              {!settings.biometricEnabled && (
-                <Button variant="outline" className="w-full justify-start gap-3" onClick={() => setStep("biometric")}>
-                  <HugeiconsIcon icon={FingerPrintIcon} size={18} /> Bật sinh trắc học
-                </Button>
-              )}
-              <Button variant="outline" className="w-full justify-start gap-3" onClick={() => { setPendingAction("change"); setStep("verify"); }}>
+              <Button variant="outline" className="h-11 w-full justify-start gap-3 rounded-full" onClick={() => { setPendingAction("change"); setStep("verify"); }}>
                 <HugeiconsIcon icon={ShieldCheckIcon} size={18} /> Đổi mã PIN
               </Button>
-              <Button variant="outline" className="w-full justify-start gap-3" onClick={() => { setPendingAction("disable"); setStep("verify"); }}>
+              <Button variant="outline" className="h-11 w-full justify-start gap-3 rounded-full" onClick={() => { setPendingAction("disable"); setStep("verify"); }}>
                 <HugeiconsIcon icon={ShieldCheckIcon} size={18} /> Tắt khóa bảo mật
               </Button>
             </div>
+          </>
+        ) : step === "timeout" ? (
+          <>
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle>Thời gian tự khóa</DrawerTitle>
+              <DrawerDescription>Chọn thời gian ứng dụng tự khóa khi không sử dụng.</DrawerDescription>
+            </DrawerHeader>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              {[1, 5, 15, 30].map((minutes) => (
+                <Button
+                  key={minutes}
+                  variant={settings?.autoLockMinutes === minutes || (!settings?.autoLockMinutes && minutes === DEFAULT_AUTO_LOCK_MINUTES) ? "default" : "outline"}
+                  className="h-11 rounded-full"
+                  onClick={() => {
+                    const current = getSecuritySettings();
+                    if (!current) return;
+                    saveSecuritySettings({ ...current, autoLockMinutes: minutes });
+                    refresh();
+                    setStep("overview");
+                  }}
+                >
+                  {minutes} phút
+                </Button>
+              ))}
+            </div>
+            <Button variant="outline" onClick={() => setStep("overview")} className="mt-3 h-11 w-full rounded-full">
+              Quay lại
+            </Button>
           </>
         ) : step === "biometric" ? (
           <>
             <DrawerHeader className="p-0 text-left">
               <DrawerTitle>Bật sinh trắc học</DrawerTitle>
-              <DrawerDescription>Sử dụng vân tay, khuôn mặt hoặc phương thức xác thực được thiết bị hỗ trợ để mở khóa e2m nhanh hơn.</DrawerDescription>
+              <DrawerDescription>Sử dụng vân tay, khuôn mặt hoặc phương thức xác thực được thiết bị hỗ trợ để mở khóa nhanh hơn.</DrawerDescription>
             </DrawerHeader>
-            <HugeiconsIcon icon={FingerPrintIcon} size={48} className="mx-auto text-primary" />
+            <HugeiconsIcon icon={FingerPrintIcon} size={48} className="mx-auto mt-5 text-primary" />
             {error && <p className="text-center text-sm text-destructive">{error}</p>}
-            <Button onClick={handleBiometric} disabled={busy} className="w-full">Bật sinh trắc học</Button>
-            <Button variant="ghost" onClick={() => { setStep("overview"); close(); }}>Để sau</Button>
+            <div className="mt-5 space-y-2">
+              <Button onClick={handleBiometric} disabled={busy} className="h-11 w-full rounded-full">Bật sinh trắc học</Button>
+              <Button variant="ghost" className="h-11 w-full rounded-full" onClick={() => { setStep("overview"); close(); }}>Để sau</Button>
+            </div>
           </>
         ) : step === "new-pin" ? (
           <>
             <DrawerHeader className="p-0 text-left">
               <DrawerTitle>Đổi mã PIN</DrawerTitle>
-              <DrawerDescription>Nhập mã PIN e2m mới gồm 6 chữ số.</DrawerDescription>
+              <DrawerDescription>Nhập mã PIN mới gồm 6 chữ số.</DrawerDescription>
             </DrawerHeader>
             <PinInput value={newPin} onChange={setNewPin} disabled={busy} />
             {error && <p className="text-center text-sm text-destructive">{error}</p>}
@@ -238,9 +273,6 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
           <>
             {step === "confirm" || step === "setup" ? renderPinStep() : null}
           </>
-        )}
-        {step === "verify" && (
-          <Button variant="ghost" onClick={() => setStep("overview")}><HugeiconsIcon icon={ArrowLeft01Icon} size={18} /> Quay lại</Button>
         )}
           </div>
         </div>

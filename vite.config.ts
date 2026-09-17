@@ -17,8 +17,8 @@ export default defineConfig({
       },
       includeAssets: ['montra-icon.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Montra – Quản lý thu chi',
-        short_name: 'Montra',
+        name: 'e2m - Quản lý thu chi',
+        short_name: 'e2m',
         description: 'Quản lý thu chi cá nhân, local-first.',
         start_url: '/home',
         scope: '/',

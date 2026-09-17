@@ -18,10 +18,10 @@ export function LockScreen() {
     setError("");
     try {
       if (!(await unlockWithBiometric())) {
-        setError("Xác thực không thành công. Bạn có thể mở khóa bằng mã PIN e2m.");
+        setError("Xác thực không thành công. Bạn có thể mở khóa bằng mã PIN.");
       }
     } catch {
-      setError("Xác thực không thành công. Bạn có thể mở khóa bằng mã PIN e2m.");
+      setError("Xác thực không thành công. Bạn có thể mở khóa bằng mã PIN.");
     } finally {
       setBusy(false);
     }
@@ -41,34 +41,34 @@ export function LockScreen() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex min-h-dvh items-center justify-center bg-background px-4 text-text-primary">
-      <div className="w-full max-w-sm space-y-6 text-center">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-surface text-primary">
+    <div className="fixed inset-0 z-[100] flex min-h-dvh items-center justify-center bg-background px-5 py-8 text-text-primary">
+      <div className="w-full max-w-sm text-center">
+        <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-surface text-primary">
           <HugeiconsIcon icon={ShieldCheckIcon} size={34} strokeWidth={2} />
         </div>
-        <div className="space-y-2">
-          <h1 className="text-xl font-bold">e2m đã được khóa</h1>
-          <p className="text-sm text-text-secondary">Ứng dụng đang được khóa để bảo vệ dữ liệu của bạn.</p>
+        <div className="mt-6 space-y-2">
+          <h1 className="text-xl font-bold">Mở khóa ứng dụng</h1>
+          <p className="text-sm leading-6 text-text-secondary">Xác thực để tiếp tục quản lý tài chính của bạn.</p>
         </div>
 
         {!showPin && settings?.biometricEnabled ? (
-          <div className="space-y-3">
-            <Button className="w-full gap-2" onClick={handleBiometric} disabled={busy}>
+          <div className="mt-6 space-y-3">
+            <Button className="h-11 w-full gap-2 rounded-full" onClick={handleBiometric} disabled={busy}>
               <HugeiconsIcon icon={FingerPrintIcon} size={19} />
               {busy ? "Đang xác thực..." : "Mở khóa bằng sinh trắc học"}
             </Button>
-            <Button variant="ghost" className="w-full" onClick={() => setShowPin(true)}>Mở khóa bằng PIN</Button>
+            <Button variant="ghost" className="h-11 w-full rounded-full" onClick={() => setShowPin(true)}>Mở khóa bằng PIN</Button>
           </div>
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm font-medium">Nhập mã PIN e2m</p>
+          <div className="mt-6 space-y-3">
+            <p className="text-sm font-medium">Nhập mã PIN</p>
             <PinInput value={pin} onChange={setPin} disabled={busy} />
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button className="w-full" onClick={handlePin} disabled={busy || pin.length !== 6}>
+            <p className="min-h-5 text-sm text-destructive">{error}</p>
+            <Button className="h-11 w-full rounded-full" onClick={handlePin} disabled={busy || pin.length !== 6}>
               {busy ? "Đang mở khóa..." : "Mở khóa"}
             </Button>
             {settings?.biometricEnabled && (
-              <Button variant="ghost" className="w-full" onClick={() => { setShowPin(false); setError(""); }}>Quay lại sinh trắc học</Button>
+              <Button variant="ghost" className="h-11 w-full rounded-full" onClick={() => { setShowPin(false); setError(""); }}>Quay lại sinh trắc học</Button>
             )}
           </div>
         )}

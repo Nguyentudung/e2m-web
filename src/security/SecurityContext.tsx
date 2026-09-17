@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { AUTO_LOCK_TIMEOUT, getSecuritySettings } from "./security";
+import { getAutoLockTimeout, getSecuritySettings } from "./security";
 import { verifyBiometric } from "./biometric";
 import { verifyPin } from "./pin";
 import { SecurityContext } from "./context";
@@ -64,14 +64,14 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       if (
         getSecuritySettings()?.enabled &&
         !isLocked &&
-        Date.now() - lastActivity.current >= AUTO_LOCK_TIMEOUT
+        Date.now() - lastActivity.current >= getAutoLockTimeout()
       ) {
         setIsLocked(true);
       }
     };
     const handleVisibility = () => {
       if (document.visibilityState === "hidden") {
-        lastActivity.current = Date.now() - AUTO_LOCK_TIMEOUT;
+        lastActivity.current = Date.now() - getAutoLockTimeout();
       } else {
         checkInactivity();
       }

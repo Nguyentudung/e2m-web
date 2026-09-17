@@ -4,6 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   UserIcon,
   PencilEdit02Icon,
+  Clock01Icon,
   Sun01Icon,
   Moon01Icon,
   HelpCircleIcon,
@@ -11,6 +12,7 @@ import {
   InformationCircleIcon,
   ArrowRight01Icon,
   ShieldCheckIcon,
+  FingerPrintIcon,
   GiftIcon,
   QrCodeIcon,
 } from "@hugeicons/core-free-icons";
@@ -23,6 +25,7 @@ import DataBackupModal from "@/components/profile/DataBackupModal";
 import { getUserProfile, saveUserProfile } from "../utils/userStorage";
 import { SecurityDialog } from "@/security/SecurityDialog";
 import { useSecurity } from "@/security/useSecurity";
+import type { SecurityEntryPoint } from "@/security/SecurityDialog";
 
 function ProfilePage() {
   const [profileData, setProfileData] = useState(() => getUserProfile());
@@ -32,6 +35,7 @@ function ProfilePage() {
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
+  const [securityEntryPoint, setSecurityEntryPoint] = useState<SecurityEntryPoint>("overview");
   const { settings } = useSecurity();
 
   // Sync theme status on mount & change
@@ -262,13 +266,13 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => setIsEditingName(true)}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
                 <HugeiconsIcon icon={UserIcon} size={18} strokeWidth={2} />
               </div>
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="min-w-0 flex-1 text-sm font-semibold leading-5 text-text-primary">
                 Tài khoản ({userHandle})
               </span>
             </div>
@@ -285,13 +289,13 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => setIsEditingAvatar(true)}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
                 <HugeiconsIcon icon={PencilEdit02Icon} size={18} strokeWidth={2} />
               </div>
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="min-w-0 flex-1 text-sm font-semibold leading-5 text-text-primary">
                 Đổi ảnh đại diện & Hiệu ứng động
               </span>
             </div>
@@ -334,40 +338,14 @@ function ProfilePage() {
           {/* Data Backup item */}
           <button
             type="button"
-            onClick={() => setIsSecurityOpen(true)}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
-                <HugeiconsIcon icon={ShieldCheckIcon} size={18} strokeWidth={2} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">Khóa bảo mật</p>
-                <p className="text-[11px] text-text-secondary mt-0.5">
-                  {settings?.enabled ? "Đã bật" : "Chưa thiết lập"}
-                </p>
-              </div>
-            </div>
-
-            <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              size={18}
-              strokeWidth={2}
-              className="text-text-tertiary"
-            />
-          </button>
-
-          {/* Data Backup item */}
-          <button
-            type="button"
             onClick={() => setIsBackupOpen(true)}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
                 <HugeiconsIcon icon={FolderSecurityIcon} size={18} strokeWidth={2} />
               </div>
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="min-w-0 flex-1 text-sm font-semibold leading-5 text-text-primary">
                 Quản lý & Sao lưu dữ liệu
               </span>
             </div>
@@ -383,7 +361,89 @@ function ProfilePage() {
       </div>
 
       {/* ================================================== */}
-      {/* 5. RESOURCES & HELP (Tài nguyên) */}
+      {/* 5. SECURITY (Bảo mật) */}
+      {/* ================================================== */}
+      <div className="space-y-2">
+        <h2 className="px-1 text-xs font-semibold text-text-tertiary">
+          Bảo mật
+        </h2>
+
+        <div className="overflow-hidden rounded-[22px] bg-surface divide-y divide-border/50">
+          <button
+            type="button"
+            onClick={() => {
+              setSecurityEntryPoint("overview");
+              setIsSecurityOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-secondary/40 active:bg-surface-secondary/60"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1D2129] text-white dark:bg-white/15">
+                <HugeiconsIcon icon={ShieldCheckIcon} size={18} strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-5 text-text-primary">Mã PIN</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-text-secondary">
+                  {settings?.enabled ? "Đang bật" : "Chưa thiết lập"}
+                </p>
+              </div>
+            </div>
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={18}
+              strokeWidth={2}
+              className="shrink-0 text-text-tertiary"
+            />
+          </button>
+          <button
+            type="button"
+            disabled={!settings?.enabled}
+            onClick={() => {
+              setSecurityEntryPoint("biometric");
+              setIsSecurityOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-secondary/40 active:bg-surface-secondary/60 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1D2129] text-white dark:bg-white/15">
+                <HugeiconsIcon icon={FingerPrintIcon} size={18} strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-5 text-text-primary">Sinh trắc học</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-text-secondary">
+                  {settings?.enabled ? (settings.biometricEnabled ? "Đang bật" : "Chưa bật") : "Cần bật mã PIN"}
+                </p>
+              </div>
+            </div>
+            <HugeiconsIcon icon={ArrowRight01Icon} size={18} strokeWidth={2} className="shrink-0 text-text-tertiary" />
+          </button>
+          <button
+            type="button"
+            disabled={!settings?.enabled}
+            onClick={() => {
+              setSecurityEntryPoint("timeout");
+              setIsSecurityOpen(true);
+            }}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface-secondary/40 active:bg-surface-secondary/60 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1D2129] text-white dark:bg-white/15">
+                <HugeiconsIcon icon={Clock01Icon} size={18} strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-5 text-text-primary">Thời gian khóa màn hình</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-text-secondary">
+                  {settings?.enabled ? `${settings.autoLockMinutes ?? 5} phút` : "Cần bật mã PIN"}
+                </p>
+              </div>
+            </div>
+            <HugeiconsIcon icon={ArrowRight01Icon} size={18} strokeWidth={2} className="shrink-0 text-text-tertiary" />
+          </button>
+        </div>
+      </div>
+
+      {/* ================================================== */}
+      {/* 6. RESOURCES & HELP (Tài nguyên) */}
       {/* ================================================== */}
       <div className="space-y-2">
         <h2 className="px-1 text-xs font-semibold text-text-tertiary">
@@ -395,13 +455,13 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => setIsGuideOpen(true)}
-            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
                 <HugeiconsIcon icon={HelpCircleIcon} size={18} strokeWidth={2} />
               </div>
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="min-w-0 flex-1 text-sm font-semibold leading-5 text-text-primary">
                 Trung tâm trợ giúp & Hướng dẫn
               </span>
             </div>
@@ -450,7 +510,12 @@ function ProfilePage() {
         onSave={handleSaveAvatar}
       />
 
-      <SecurityDialog key={isSecurityOpen ? "open" : "closed"} open={isSecurityOpen} onOpenChange={setIsSecurityOpen} />
+      <SecurityDialog
+        key={`${isSecurityOpen ? "open" : "closed"}-${securityEntryPoint}`}
+        open={isSecurityOpen}
+        onOpenChange={setIsSecurityOpen}
+        initialStep={securityEntryPoint}
+      />
 
       <UserGuideModal
         open={isGuideOpen}
