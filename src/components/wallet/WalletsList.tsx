@@ -35,6 +35,9 @@ function WalletsList({
     exchangeRates === null
       ? null
       : wallets.reduce((total, item) => {
+          if (item.includeInTotal === false) {
+            return total;
+          }
           try {
             return (
               total + convertToVnd(item.balance, item.currency, exchangeRates)
@@ -134,22 +137,22 @@ function WalletsList({
 
           {/* Nội dung chữ */}
           <div className="relative z-10">
-            <p className="mb-2 text-sm font-medium text-slate-600 dark:text-slate-400">
+            <p className="mb-2 text-sm font-medium text-text-secondary">
               Tài sản ròng
             </p>
 
-            <p className="mb-8 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <p className="mb-8 text-3xl font-bold tracking-tight text-text-primary">
               {totalBalance === null
                 ? "Đang cập nhật..."
                 : formatCurrency(totalBalance, displayCurrency)}
             </p>
 
             <div>
-              <p className="mb-1 text-sm font-medium text-slate-600 dark:text-slate-400">
+              <p className="mb-1 text-sm font-medium text-text-secondary">
                 Tài sản
               </p>
 
-              <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              <p className="text-lg font-semibold text-text-primary">
                 {totalBalance === null
                   ? "Đang cập nhật..."
                   : formatCurrency(totalBalance, displayCurrency)}
@@ -199,7 +202,7 @@ function WalletsList({
             </div>
           ) : (
             /* WALLET CARDS */
-            <div className="space-y-4">
+            <div className="space-y-3">
               {wallets.map((item) => {
                 const asset = getAssetMetadata(item);
                 const assetIcon = getAssetIcon(item.type, asset?.icon);
@@ -216,19 +219,19 @@ function WalletsList({
                     key={item.id}
                     type="button"
                     onClick={() => onSelectWallet(item)}
-                    className="wallet-card w-full overflow-hidden rounded-[24px] p-0 text-left transition active:scale-[0.99]"
+                    className="w-full overflow-hidden rounded-2xl bg-surface p-4 text-left transition active:scale-[0.99]"
                   >
                     {/* LỚP 1 — LOẠI TÀI SẢN */}
-                    <div className="flex h-8 items-center justify-center px-4">
+                    <div className="flex h-7 items-center px-1">
                       <span className="text-sm font-medium text-primary-accent">
                         {assetType}
                       </span>
                     </div>
 
                     {/* LỚP 2 — NỘI DUNG */}
-                    <div className="wallet-card-surface rounded-[24px] px-3 pb-4 pt-4">
+                    <div className="mt-2 rounded-xl bg-background px-3 pb-4 pt-4">
                       {/* LỚP 3 — ASSET CARD */}
-                      <div className="rounded-[20px] border-2 border-dashed border-border bg-background px-4 py-3">
+                      <div className="rounded-xl bg-surface px-4 py-3">
                         <div className="flex items-center gap-3">
                           {/* ICON */}
                           <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface">

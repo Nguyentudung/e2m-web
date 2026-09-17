@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 import logo from "../assets/logo.png";
 
@@ -12,21 +13,22 @@ import ExpandableSearch from "../components/layout/ExpandableSearch";
 import RightDrawerMenu from "../components/layout/RightDrawerMenu";
 
 import { NavigationProvider } from "../contexts/NavigationContext";
+import { Toaster } from "@/components/ui/toast";
+
+const ROOT_PATHS = ["/home", "/reports", "/wallets", "/profile"];
 
 function AppLayout() {
+  const { pathname } = useLocation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [isBottomNavVisible, setIsBottomNavVisible] = useState(true);
 
+  const isRootPage = ROOT_PATHS.includes(pathname);
+  const shouldShowBottomNav = isRootPage && isBottomNavVisible;
+
   return (
     <NavigationProvider setBottomNavVisible={setIsBottomNavVisible}>
       <div className="relative min-h-screen overflow-x-hidden bg-background text-text-primary">
-        {/* BACKGROUND IMAGE */}
-        <div
-          className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center"
-          aria-hidden="true"
-        />
-
         {/* DESKTOP HEADER */}
         <header className="relative z-20 hidden h-16 bg-background/95 md:block">
           <div className="grid h-full grid-cols-[1fr_auto_1fr] items-center px-6">
@@ -71,18 +73,28 @@ function AppLayout() {
           <Outlet />
         </main>
 
-        {/* MOBILE BOTTOM NAV */}
-        {isBottomNavVisible && (
-          <div className="relative z-30 md:hidden">
-            <BottomNav />
-          </div>
-        )}
+        {/* MOBILE BOTTOM NAV – trượt lên/xuống mượt */}
+        <AnimatePresence>
+          {shouldShowBottomNav && (
+            <motion.div
+              key="bottom-nav"
+              className="fixed inset-x-0 bottom-0 z-30 md:hidden"
+              initial={{ y: 140, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 140, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+            >
+              <BottomNav />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* RIGHT DRAWER MENU */}
         <RightDrawerMenu
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
         />
+        <Toaster />
       </div>
     </NavigationProvider>
   );

@@ -1,291 +1,222 @@
-import { useState } from "react";
-
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-
 import {
-  FieldGroup,
-  FieldSet,
-  FieldLegend,
-  FieldDescription,
-  FieldSeparator,
-} from "@/components/ui/field";
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  Wallet01Icon,
+} from "@hugeicons/core-free-icons";
 
-import AssetTypeField from "./CreateWallet/AssetTypeField";
-import AssetSelectorField from "./CreateWallet/AssetSelectorField";
-import BalanceField from "./CreateWallet/BalanceField";
-import CurrencyField from "./CreateWallet/CurrencyField";
-import NoteField from "./CreateWallet/NoteField";
-import CreateWalletActions from "./CreateWallet/CreateWalletActions";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { getCurrencySymbol } from "@/utils/currency";
+import { getAssetIcon } from "@/utils/assetIcons";
+import type { AssetType } from "./CreateWalletTypes";
 
-export type AssetType = "cash" | "bank" | "ewallet" | "card";
+export type { AssetType } from "./CreateWalletTypes";
+export type { SelectedAsset } from "./CreateWalletTypes";
 
-export interface SelectedAsset {
+export interface CreateWalletDraft {
   type: AssetType;
-  id?: string;
-  name?: string;
-  icon?: string;
+  assetId?: string;
+  assetName?: string;
+  assetIcon?: string;
+  balance: string;
+  currency: string;
+  note: string;
+  includeInTotal: boolean;
+}
+
+export interface CreateWalletResult {
+  type: AssetType;
+  assetId?: string;
+  balance: number;
+  currency: string;
+  note: string;
+  includeInTotal: boolean;
 }
 
 interface CreateWalletPageProps {
-  selectedAsset: SelectedAsset | null;
+  draft: CreateWalletDraft;
+  onChange: (patch: Partial<CreateWalletDraft>) => void;
   onBack: () => void;
-  onSelectBank: () => void;
-  onSelectEwallet: () => void;
-  onSelectCard: () => void;
-
-  onSave: (data: {
-    type: AssetType;
-    assetId?: string;
-    balance: number;
-    currency: string;
-    note: string;
-  }) => void;
+  onSelectAssetType: () => void;
+  onSelectCurrency: () => void;
+  onSave: (data: CreateWalletResult) => void;
 }
 
+const TYPE_LABELS: Record<AssetType, string> = {
+  cash: "Tiền mặt",
+  bank: "Ngân hàng",
+  ewallet: "Ví điện tử",
+  card: "Thẻ",
+};
+
 function CreateWalletPage({
-  selectedAsset,
+  draft,
+  onChange,
   onBack,
-  onSelectBank,
-  onSelectEwallet,
-  onSelectCard,
+  onSelectAssetType,
+  onSelectCurrency,
   onSave,
 }: CreateWalletPageProps) {
-  const [type, setType] = useState<AssetType>("cash");
-  const [balance, setBalance] = useState("");
-  const [currency, setCurrency] = useState("VND");
-  const [note, setNote] = useState("");
+  const numericBalance = Number(draft.balance);
+  const balanceValid =
+    draft.balance !== "" &&
+    Number.isFinite(numericBalance) &&
+    numericBalance >= 0;
+  const assetSelected = draft.type === "cash" || Boolean(draft.assetId);
 
-  const handleAssetTypeChange = (newType: AssetType) => {
-    setType(newType);
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
 
-    if (newType === "bank") {
-      onSelectBank();
-    }
-
-    if (newType === "ewallet") {
-      onSelectEwallet();
-    }
-
-    if (newType === "card") {
-      onSelectCard();
-    }
-  };
-
-  const handleSelectAsset = () => {
-    if (type === "bank") {
-      onSelectBank();
-    }
-
-    if (type === "ewallet") {
-      onSelectEwallet();
-    }
-
-    if (type === "card") {
-      onSelectCard();
-    }
-  };
-
-  const handleSubmit = () => {
-    const numericBalance = Number(balance);
-
-    if (
-      balance === "" ||
-      !Number.isFinite(numericBalance) ||
-      numericBalance < 0
-    ) {
-      return;
-    }
+    if (!balanceValid || !assetSelected) return;
 
     onSave({
-      type,
-
-      // Chỉ lưu ID của tài sản.
-      // Ví dụ ngân hàng Woori -> "woori"
-      assetId: selectedAsset?.id,
-
+      type: draft.type,
+      assetId: draft.assetId,
       balance: numericBalance,
-      currency,
-      note: note.trim(),
+      currency: draft.currency,
+      note: draft.note.trim(),
+      includeInTotal: draft.includeInTotal,
     });
   };
 
+  const assetIcon = getAssetIcon(draft.type, draft.assetIcon);
+
   return (
-    <section className="flex h-[100dvh] flex-col overflow-hidden bg-surface">
+    <section className="flex h-full flex-col bg-background">
       {/* ================= HEADER ================= */}
-      <div
-        className="
-          relative
-          shrink-0
-          rounded-b-[32px]
-          bg-background
-          px-4
-          pt-4
-          pb-3
-          sm:px-8
-        "
-      >
-        <div className="mx-auto w-full max-w-2xl">
-          {/* NÚT BACK */}
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label="Quay lại"
-            className="
-              flex
-              size-11
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              bg-surface
-              text-text-primary
-              transition
-              hover:bg-surface/80
-              active:scale-95
-            "
-          >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={22} strokeWidth={2} />
-          </button>
-
-          {/* TIÊU ĐỀ */}
-          <div
-            className="
-              pointer-events-none
-              absolute
-              inset-x-0
-              top-1/2
-              -translate-y-1/2
-              text-center
-            "
-          >
-            <h1
-              className="
-                text-xl
-                font-bold
-                leading-tight
-                tracking-tight
-                text-text-primary
-                sm:text-2xl
-              "
-            >
-              Tạo ví mới
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      {/* ================= KHOẢNG CÁCH ================= */}
-      <div className="h-2 shrink-0" />
+      <header className="relative flex shrink-0 items-center px-4 pt-4 pb-3">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Quay lại"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface transition active:scale-95"
+        >
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={22} strokeWidth={2} />
+        </button>
+        <h1 className="pointer-events-none absolute inset-x-0 text-center text-lg font-bold">
+          Tạo Tài Khoản
+        </h1>
+      </header>
 
       {/* ================= FORM ================= */}
       <form
         id="create-wallet-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          handleSubmit();
-        }}
-        className="
-          min-h-0
-          flex-1
-          overflow-y-auto
-          overscroll-contain
-          rounded-t-[32px]
-          bg-background
-          px-4
-          pt-5
-          pb-16
-          sm:px-8
-          sm:pt-8
-          [&::-webkit-scrollbar]:hidden
-          [scrollbar-width:none]
-        "
+        onSubmit={handleSubmit}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
       >
-        <div className="mx-auto w-full max-w-2xl">
-          <FieldGroup className="gap-5">
-            {/* TÀI SẢN */}
-            <FieldSet className="gap-4">
-              <FieldLegend className="w-full text-center text-xl font-semibold sm:text-xl">
-                Thông tin tài sản
-              </FieldLegend>
+        <div className="space-y-2">
+          {/* LOẠI TÀI KHOẢN */}
+          <button
+            type="button"
+            onClick={onSelectAssetType}
+            className="flex min-h-16 w-full items-center gap-3 rounded-2xl bg-surface px-4 text-left"
+          >
+            <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-secondary">
+              {assetIcon ? (
+                <img src={assetIcon} alt="" className="size-7 rounded-md object-contain" />
+              ) : (
+                <HugeiconsIcon icon={Wallet01Icon} size={20} strokeWidth={1.8} />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-text-secondary">Loại tài khoản</span>
+              <span className="block truncate font-semibold">
+                {draft.assetName
+                  ? `${TYPE_LABELS[draft.type]} · ${draft.assetName}`
+                  : TYPE_LABELS[draft.type]}
+              </span>
+            </span>
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={18}
+              className="shrink-0 text-text-tertiary"
+            />
+          </button>
 
-              <FieldGroup className="gap-4">
-                <AssetTypeField value={type} onChange={handleAssetTypeChange} />
+          {/* SỐ DƯ HIỆN TẠI */}
+          <div className="flex min-h-16 items-center gap-3 rounded-2xl bg-surface px-4">
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-text-secondary">Số dư hiện tại</span>
+              <input
+                value={draft.balance}
+                onChange={(event) =>
+                  onChange({ balance: event.target.value.replace(/[^\d.]/g, "") })
+                }
+                inputMode="decimal"
+                placeholder="0"
+                aria-label="Số dư hiện tại"
+                className="w-full bg-transparent text-lg font-semibold outline-none placeholder:text-text-disabled"
+              />
+            </span>
+            <span className="shrink-0 text-sm font-semibold text-text-secondary">
+              {draft.currency}
+            </span>
+          </div>
 
-                {type !== "cash" && (
-                  <AssetSelectorField
-                    type={type}
-                    selectedAsset={selectedAsset}
-                    selectedAssetIcon={selectedAsset?.icon}
-                    onSelect={handleSelectAsset}
-                  />
-                )}
-              </FieldGroup>
-            </FieldSet>
+          {/* TIỀN TỆ */}
+          <button
+            type="button"
+            onClick={onSelectCurrency}
+            className="flex min-h-16 w-full items-center gap-3 rounded-2xl bg-surface px-4 text-left"
+          >
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-surface-secondary text-sm font-bold">
+              {getCurrencySymbol(draft.currency)}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-text-secondary">Tiền tệ</span>
+              <span className="block truncate font-semibold">{draft.currency}</span>
+            </span>
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={18}
+              className="shrink-0 text-text-tertiary"
+            />
+          </button>
 
-            <FieldSeparator />
+          {/* GHI CHÚ */}
+          <div className="flex min-h-16 items-center gap-3 rounded-2xl bg-surface px-4">
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs text-text-secondary">Ghi chú</span>
+              <input
+                value={draft.note}
+                onChange={(event) => onChange({ note: event.target.value })}
+                placeholder="Thêm thông tin để dễ nhận biết..."
+                aria-label="Ghi chú"
+                className="w-full bg-transparent text-sm outline-none placeholder:text-text-disabled"
+              />
+            </span>
+          </div>
 
-            {/* SỐ DƯ */}
-            <FieldSet className="gap-4">
-              <FieldLegend className="text-lg font-semibold sm:text-xl">
-                Số dư ban đầu
-              </FieldLegend>
-
-              <FieldDescription className="text-sm sm:text-base">
-                Nhập số tiền hiện có trong tài sản này.
-              </FieldDescription>
-
-              <div className="grid grid-cols-2 gap-3">
-                <BalanceField
-                  value={balance}
-                  currency={currency}
-                  onChange={setBalance}
-                />
-
-                <CurrencyField value={currency} onChange={setCurrency} />
-              </div>
-            </FieldSet>
-
-            <FieldSeparator />
-
-            {/* GHI CHÚ */}
-            <FieldSet className="gap-4">
-              <FieldLegend className="text-lg font-semibold sm:text-xl">
-                Ghi chú
-              </FieldLegend>
-
-              <FieldDescription className="text-sm sm:text-base">
-                Thêm thông tin để dễ nhận biết tài sản sau này.
-              </FieldDescription>
-
-              <FieldGroup className="gap-4">
-                <NoteField value={note} onChange={setNote} />
-              </FieldGroup>
-            </FieldSet>
-
-            <FieldSeparator />
-          </FieldGroup>
+          {/* ĐÃ BAO GỒM TRONG TỔNG TÀI SẢN */}
+          <div className="flex min-h-16 items-center gap-3 rounded-2xl bg-surface px-4">
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold">
+                Đã bao gồm trong tổng tài sản
+              </span>
+              <span className="block text-xs text-text-secondary">
+                Bỏ chọn nếu đây là khoản vay hoặc thẻ tín dụng
+              </span>
+            </span>
+            <Switch
+              checked={draft.includeInTotal}
+              onCheckedChange={(checked) => onChange({ includeInTotal: checked })}
+              aria-label="Đã bao gồm trong tổng tài sản"
+            />
+          </div>
         </div>
       </form>
 
       {/* ================= ACTION ================= */}
-      <div
-        className="
-    shrink-0
-    bg-background
-    px-4
-    pt-3
-    pb-[calc(12px+env(safe-area-inset-bottom))]
-    sm:px-8
-    sm:pb-4
-  "
-      >
-        <div className="mx-auto w-full max-w-2xl">
-          <CreateWalletActions
-            disabled={!balance || (type !== "cash" && !selectedAsset?.id)}
-            onCancel={onBack}
-          />
-        </div>
+      <div className="shrink-0 bg-background px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+        <Button
+          type="submit"
+          form="create-wallet-form"
+          disabled={!balanceValid || !assetSelected}
+          className="h-12 w-full rounded-full font-bold"
+        >
+          Lưu
+        </Button>
       </div>
     </section>
   );

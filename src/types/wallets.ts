@@ -12,6 +12,9 @@ export interface Wallet {
   currency: string;
   note: string;
 
+  /** false = không tính vào tổng tài sản */
+  includeInTotal?: boolean;
+
   createdAt: string;
   updatedAt: string;
 }
@@ -36,6 +39,7 @@ export function saveWallet(wallet: Wallet): void {
   const wallets = getWallets();
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...wallets, wallet]));
+  window.dispatchEvent(new Event("montra:data-changed"));
 }
 
 export function createWallet(
@@ -59,6 +63,7 @@ export function updateWallet(updatedWallet: Wallet): void {
   );
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWallets));
+  window.dispatchEvent(new Event("montra:data-changed"));
 }
 
 export function deleteWallet(walletId: string): void {
@@ -67,4 +72,11 @@ export function deleteWallet(walletId: string): void {
   const updatedWallets = wallets.filter((wallet) => wallet.id !== walletId);
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedWallets));
+  window.dispatchEvent(new Event("montra:data-changed"));
+}
+
+export function applyWalletBalanceChange(walletId: string, amount: number): void {
+  const wallet = getWallets().find((item) => item.id === walletId);
+  if (!wallet) throw new Error("Không tìm thấy ví");
+  updateWallet({ ...wallet, balance: wallet.balance + amount, updatedAt: new Date().toISOString() });
 }

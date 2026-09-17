@@ -59,29 +59,32 @@ body {
     sans-serif;
 }
 
-/* ========================================
-   BASE COLORS
-======================================== */
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
 
 /* ========================================
-   BASE COLORS
+   BRAND COLORS
+   Giữ nguyên palette primary / secondary hiện tại.
 ======================================== */
 
 @theme {
-  /* ========================================
-     BRAND - PURPLE / PRIMARY
-  ======================================== */
+  /* PRIMARY - PURPLE */
 
-  --color-primary-100: #f0efff;
-  --color-primary-200: #e4e2ff;
-  --color-primary-300: #bcb8fa;
-  --color-primary-400: #8982f5;
-  --color-primary-500: #6a63f1;
+  --color-primary-100: #e3e0e0;
+  --color-primary-200: #f0eeee;
+  --color-primary-300: #514b4a;
+  --color-primary-400: #cd130a;
+  --color-primary-500: #cd130a;
 
-  /* ========================================
-     BRAND - BLUE / SECONDARY
-     Main: #315BFF
-  ======================================== */
+  /* SECONDARY - BLUE */
 
   --color-secondary-100: #eef2ff;
   --color-secondary-200: #dce4ff;
@@ -89,27 +92,19 @@ body {
   --color-secondary-400: #6382ff;
   --color-secondary-500: #315bff;
 
-  /* ========================================
-     GREEN
-  ======================================== */
+  /* STATUS */
 
   --color-green-base-100: #e0f5e8;
   --color-green-base-200: #31bd65;
   --color-green-base-300: #29ad5a;
   --color-green-base-400: #008535;
 
-  /* ========================================
-     RED
-  ======================================== */
-
   --color-red-base-100: #fce4e9;
   --color-red-base-200: #eb4b6d;
   --color-red-base-300: #dd4263;
   --color-red-base-400: #cd2438;
 
-  /* ========================================
-     BASE
-  ======================================== */
+  /* ABSOLUTE BASE */
 
   --color-dark-base: #000000;
   --color-light-base: #ffffff;
@@ -117,224 +112,206 @@ body {
 
 /* ========================================
    LIGHT THEME
+   Nền ngoài và nền khối lấy theo ảnh tham chiếu.
 ======================================== */
 
 :root {
   /* BACKGROUND */
 
-  --background: #ffffff;
-  --surface: #f4f5f7;
-  --surface-secondary: #e8ebf0;
+  --background: #e3e0e0;
+  --surface: #f0eeee;
+  --surface-secondary: #f0eeee;
+  --taskbar-background: #1b1817;
 
-  /* TEXT - BASE */
+  /* TEXT */
 
-  --text-primary: #171717;
-  --text-secondary: #5e5e5e;
-  --text-tertiary: #8e95a2;
-  --text-disabled: #a3a3a3;
+  --text-primary: #1b1817;
+  --text-secondary: #514b4a;
+  --text-tertiary: #514b4a;
+  --text-disabled: #c4c0bf;
 
-  /* TEXT - BRAND */
+  /* BRAND */
 
   --text-brand-primary: var(--color-primary-500);
   --text-brand-secondary: var(--color-secondary-500);
 
-  /* PRIMARY ACCENT */
-
   --primary-accent: var(--color-primary-500);
-  --primary-accent-text: #ffffff;
+  --primary-accent-text: #fbfbfb;
 
   /* DISABLED */
 
-  --disabled-background: #f1f1f3;
-  --disabled-border: #e2e2e6;
-  --disabled-text: #a1a1aa;
+  --disabled-background: #e3e0e0;
+  --disabled-border: #c4c0bf;
+  --disabled-text: #514b4a;
 
   /* WALLET */
 
-  --wallet-card-bg: #dce4ff;
-  --wallet-card-surface: #f5f5f5;
+  --wallet-card-bg: #f0eeee;
+  --wallet-card-surface: #f0eeee;
 
-  --wallet-total-start: #c7c3ff;
-  --wallet-total-mid: #eceaff;
-  --wallet-total-end: #f1f5f9;
+  --wallet-total-start: #e3e0e0;
+  --wallet-total-mid: #f0eeee;
+  --wallet-total-end: #f0eeee;
 
   --wallet-logo-opacity: 0.3;
 
   /* BORDER */
 
-  --border: oklch(0.922 0 0);
+  --border: #c4c0bf;
 
-  --foreground: oklch(0.145 0 0);
+  /* SHADCN SEMANTIC COLORS
+     Đồng bộ với palette chính, không dùng oklch mặc định.
+  */
 
-  --card: oklch(1 0 0);
+  --foreground: var(--text-primary);
 
-  --card-foreground: oklch(0.145 0 0);
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
 
-  --popover: oklch(1 0 0);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
 
-  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--primary-accent);
+  --primary-foreground: var(--primary-accent-text);
 
-  --primary: oklch(0.205 0 0);
+  --secondary: var(--surface-secondary);
+  --secondary-foreground: var(--text-primary);
 
-  --primary-foreground: oklch(0.985 0 0);
+  --muted: var(--surface-secondary);
+  --muted-foreground: var(--text-secondary);
 
-  --secondary: oklch(0.97 0 0);
+  --accent: var(--surface-secondary);
+  --accent-foreground: var(--text-primary);
 
-  --secondary-foreground: oklch(0.205 0 0);
+  --destructive: var(--color-red-base-400);
 
-  --muted: oklch(0.97 0 0);
+  --input: var(--border);
+  --ring: var(--color-primary-400);
 
-  --muted-foreground: oklch(0.556 0 0);
+  /* DATA VISUALIZATION */
 
-  --accent: oklch(0.97 0 0);
+  --chart-1: var(--color-primary-500);
+  --chart-2: var(--color-secondary-500);
+  --chart-3: var(--color-green-base-300);
+  --chart-4: var(--color-red-base-300);
+  --chart-5: var(--text-tertiary);
 
-  --accent-foreground: oklch(0.205 0 0);
-
-  --destructive: oklch(0.577 0.245 27.325);
-
-  --input: oklch(0.922 0 0);
-
-  --ring: oklch(0.708 0 0);
-
-  --chart-1: oklch(0.87 0 0);
-
-  --chart-2: oklch(0.556 0 0);
-
-  --chart-3: oklch(0.439 0 0);
-
-  --chart-4: oklch(0.371 0 0);
-
-  --chart-5: oklch(0.269 0 0);
+  /* LAYOUT */
 
   --radius: 0.625rem;
 
-  --sidebar: oklch(0.985 0 0);
+  /* SIDEBAR */
 
-  --sidebar-foreground: oklch(0.145 0 0);
-
-  --sidebar-primary: oklch(0.205 0 0);
-
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-
-  --sidebar-accent: oklch(0.97 0 0);
-
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-
-  --sidebar-border: oklch(0.922 0 0);
-
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--primary-accent);
+  --sidebar-primary-foreground: var(--primary-accent-text);
+  --sidebar-accent: var(--surface-secondary);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 /* ========================================
    DARK THEME
+   Nền ngoài và nền khối lấy theo ảnh tham chiếu.
 ======================================== */
 
 .dark {
   /* BACKGROUND */
 
-  --background: #0f1115;
-  --surface: #1c1e24;
-  --surface-secondary: #262933;
+  --background: #000000;
+  --surface: #131110;
+  --surface-secondary: #131110;
+  --taskbar-background: #fbfbfb;
 
-  /* TEXT - BASE */
+  /* TEXT */
 
-  --text-primary: #f5f5f5;
-  --text-secondary: #a3a3a3;
-  --text-tertiary: #737373;
-  --text-disabled: #525252;
+  --text-primary: #fbfbfb;
+  --text-secondary: #c4c0bf;
+  --text-tertiary: #c4c0bf;
+  --text-disabled: #c4c0bf;
 
-  /* TEXT - BRAND */
+  /* BRAND */
 
   --text-brand-primary: var(--color-primary-500);
   --text-brand-secondary: var(--color-secondary-400);
 
-  /* PRIMARY ACCENT */
-
   --primary-accent: var(--color-primary-500);
-  --primary-accent-text: #ffffff;
+  --primary-accent-text: #fbfbfb;
 
   /* DISABLED */
 
-  --disabled-background: #2a2a2f;
-  --disabled-border: #3a3a40;
-  --disabled-text: #71717a;
+  --disabled-background: #131110;
+  --disabled-border: #514b4a;
+  --disabled-text: #c4c0bf;
 
   /* WALLET */
 
-  --wallet-card-bg: #20242c;
-  --wallet-card-surface: #15181d;
+  --wallet-card-bg: #131110;
+  --wallet-card-surface: #131110;
 
-  --wallet-total-start: #55517f;
-  --wallet-total-mid: #303345;
-  --wallet-total-end: #15181d;
+  --wallet-total-start: #131110;
+  --wallet-total-mid: #131110;
+  --wallet-total-end: #131110;
 
   --wallet-logo-opacity: 0.16;
 
   /* BORDER */
 
-  --border: oklch(1 0 0 / 10%);
+  --border: #514b4a;
 
-  --foreground: oklch(0.985 0 0);
+  /* SHADCN SEMANTIC COLORS
+     Đồng bộ với palette chính, không dùng oklch mặc định.
+  */
 
-  --card: oklch(0.205 0 0);
+  --foreground: var(--text-primary);
 
-  --card-foreground: oklch(0.985 0 0);
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
 
-  --popover: oklch(0.205 0 0);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
 
-  --popover-foreground: oklch(0.985 0 0);
+  --primary: var(--primary-accent);
+  --primary-foreground: var(--primary-accent-text);
 
-  --primary: oklch(0.922 0 0);
+  --secondary: var(--surface-secondary);
+  --secondary-foreground: var(--text-primary);
 
-  --primary-foreground: oklch(0.205 0 0);
+  --muted: var(--surface-secondary);
+  --muted-foreground: var(--text-secondary);
 
-  --secondary: oklch(0.269 0 0);
+  --accent: var(--surface-secondary);
+  --accent-foreground: var(--text-primary);
 
-  --secondary-foreground: oklch(0.985 0 0);
+  --destructive: var(--color-red-base-300);
 
-  --muted: oklch(0.269 0 0);
+  --input: var(--border);
+  --ring: var(--color-primary-400);
 
-  --muted-foreground: oklch(0.708 0 0);
+  /* DATA VISUALIZATION */
 
-  --accent: oklch(0.269 0 0);
+  --chart-1: var(--color-primary-400);
+  --chart-2: var(--color-secondary-400);
+  --chart-3: var(--color-green-base-200);
+  --chart-4: var(--color-red-base-200);
+  --chart-5: var(--text-tertiary);
 
-  --accent-foreground: oklch(0.985 0 0);
+  /* SIDEBAR */
 
-  --destructive: oklch(0.704 0.191 22.216);
-
-  --input: oklch(1 0 0 / 15%);
-
-  --ring: oklch(0.556 0 0);
-
-  --chart-1: oklch(0.87 0 0);
-
-  --chart-2: oklch(0.556 0 0);
-
-  --chart-3: oklch(0.439 0 0);
-
-  --chart-4: oklch(0.371 0 0);
-
-  --chart-5: oklch(0.269 0 0);
-
-  --sidebar: oklch(0.205 0 0);
-
-  --sidebar-foreground: oklch(0.985 0 0);
-
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-
-  --sidebar-accent: oklch(0.269 0 0);
-
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-
-  --sidebar-border: oklch(1 0 0 / 10%);
-
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--primary-accent);
+  --sidebar-primary-foreground: var(--primary-accent-text);
+  --sidebar-accent: var(--surface-secondary);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 /* ========================================
-   SEMANTIC COLORS
+   TAILWIND / SEMANTIC TOKENS
 ======================================== */
 
 @theme inline {
@@ -343,20 +320,19 @@ body {
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-secondary: var(--surface-secondary);
+  --color-taskbar-background: var(--taskbar-background);
 
-  /* TEXT - BASE */
+  /* TEXT */
 
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-tertiary: var(--text-tertiary);
   --color-text-disabled: var(--text-disabled);
 
-  /* TEXT - BRAND */
+  /* BRAND */
 
   --color-text-brand-primary: var(--text-brand-primary);
   --color-text-brand-secondary: var(--text-brand-secondary);
-
-  /* PRIMARY ACCENT */
 
   --color-primary-accent: var(--primary-accent);
   --color-primary-accent-text: var(--primary-accent-text);
@@ -371,80 +347,65 @@ body {
 
   --color-border: var(--border);
 
-  --font-heading: var(--font-sans);
-
-  --font-sans: "Geist Variable", sans-serif;
-
-  --color-sidebar-ring: var(--sidebar-ring);
-
-  --color-sidebar-border: var(--sidebar-border);
-
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-
-  --color-sidebar-accent: var(--sidebar-accent);
-
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-
-  --color-sidebar-primary: var(--sidebar-primary);
-
-  --color-sidebar-foreground: var(--sidebar-foreground);
-
-  --color-sidebar: var(--sidebar);
-
-  --color-chart-5: var(--chart-5);
-
-  --color-chart-4: var(--chart-4);
-
-  --color-chart-3: var(--chart-3);
-
-  --color-chart-2: var(--chart-2);
-
-  --color-chart-1: var(--chart-1);
-
-  --color-ring: var(--ring);
-
-  --color-input: var(--input);
-
-  --color-destructive: var(--destructive);
-
-  --color-accent-foreground: var(--accent-foreground);
-
-  --color-accent: var(--accent);
-
-  --color-muted-foreground: var(--muted-foreground);
-
-  --color-muted: var(--muted);
-
-  --color-secondary-foreground: var(--secondary-foreground);
-
-  --color-secondary: var(--secondary);
-
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-primary: var(--primary);
-
-  --color-popover-foreground: var(--popover-foreground);
-
-  --color-popover: var(--popover);
-
-  --color-card-foreground: var(--card-foreground);
-
-  --color-card: var(--card);
+  /* SHADCN */
 
   --color-foreground: var(--foreground);
 
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* DATA VISUALIZATION */
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* SIDEBAR */
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* TYPOGRAPHY */
+
+  --font-heading: var(--font-sans);
+  --font-sans: "Geist Variable", sans-serif;
+
+  /* RADIUS */
+
   --radius-sm: calc(var(--radius) * 0.6);
-
   --radius-md: calc(var(--radius) * 0.8);
-
   --radius-lg: var(--radius);
-
   --radius-xl: calc(var(--radius) * 1.4);
-
   --radius-2xl: calc(var(--radius) * 1.8);
-
   --radius-3xl: calc(var(--radius) * 2.2);
-
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
@@ -480,38 +441,17 @@ html.dark .logo-light-image {
   display: none;
 }
 
+html.dark .logo-dark-image {
+  display: block;
+}
+
 /* ========================================
-   PRIMARY ACCENT BUTTONS (UNIFIED BLUE)
+   PRIMARY ACCENT BUTTONS
 ======================================== */
 
 .bg-primary-accent {
   background-color: var(--color-primary-500) !important;
-  color: #ffffff !important;
-}
-
-html.dark .bg-primary-accent {
-  background-color: var(--color-primary-500) !important;
-  color: #ffffff !important;
-}
-
-/* ========================================
-   LOGO THEME SWITCHER
-======================================== */
-
-/* Light mode: hiện logo sáng, ẩn logo tối */
-.logo-light-image {
-  display: block;
-}
-.logo-dark-image {
-  display: none;
-}
-
-/* Dark mode: ẩn logo sáng, hiện logo tối */
-html.dark .logo-light-image {
-  display: none;
-}
-html.dark .logo-dark-image {
-  display: block;
+  color: var(--primary-accent-text) !important;
 }
 
 /* ========================================
@@ -535,14 +475,22 @@ html.dark .logo-dark-image {
   background-color: var(--wallet-card-surface);
 }
 
+/* ========================================
+   BASE
+======================================== */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 }

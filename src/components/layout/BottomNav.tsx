@@ -132,14 +132,7 @@ function BottomNav() {
 
             rounded-full
 
-            /* Light theme → dark taskbar */
-            bg-dark-base
-
-            /* Dark theme → light taskbar */
-            dark:bg-light-base
-
-            shadow-[0_4px_18px_rgba(0,0,0,0.14)]
-            dark:shadow-[0_4px_18px_rgba(0,0,0,0.32)]
+            bg-taskbar-background
 
             touch-none
             select-none
@@ -183,8 +176,6 @@ function BottomNav() {
                       absolute inset-0
                       rounded-full
                       bg-primary-400
-
-                      shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)]
                     "
                     animate={{
                       scale: isDisplayingDrag ? 1.05 : 1,
@@ -244,16 +235,11 @@ function BottomNav() {
 
                 rounded-full
 
-                border-[1.5px]
-                border-light-base
-                dark:border-dark-base
-
-                bg-primary-accent/85
-                text-white
+                bg-primary-accent
+                text-primary-accent-text
 
                 backdrop-blur-xs
 
-                shadow-[inset_0_1px_2px_rgba(255,255,255,0.12)]
               "
             >
               <HugeiconsIcon

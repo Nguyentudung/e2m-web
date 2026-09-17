@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 
 import { useNavigation } from "../contexts/NavigationContext";
 
-import CreateWalletPage from "@/components/wallet/CreateWalletPage";
+import CreateWalletPage, {
+  type CreateWalletDraft,
+} from "@/components/wallet/CreateWalletPage";
 import WalletInformationPage from "@/components/wallet/WalletInformationPage";
 import BankSelectPage from "@/components/wallet/BankSelectPage";
 import EwalletSelectPage from "@/components/wallet/EwalletSelectPage";
 import CardSelectPage from "@/components/wallet/CardSelectPage";
+import AssetTypeSelectPage from "@/components/wallet/AssetTypeSelectPage";
+import CurrencySelectPage from "@/components/wallet/CurrencySelectPage";
 import WalletsList from "@/components/wallet/WalletsList";
 
 import {
@@ -26,6 +30,8 @@ type WalletPage =
   | "list"
   | "create"
   | "information"
+  | "assetType"
+  | "currency"
   | "bank"
   | "ewallet"
   | "card";
@@ -89,6 +95,26 @@ function WalletsPage() {
   );
 
   // ==================================================
+  // CREATE WALLET DRAFT
+  // ==================================================
+
+  const emptyCreateDraft: CreateWalletDraft = {
+    type: "cash",
+    balance: "",
+    currency: "VND",
+    note: "",
+    includeInTotal: true,
+  };
+
+  const [createDraft, setCreateDraft] = useState<CreateWalletDraft>(
+    emptyCreateDraft,
+  );
+
+  const updateCreateDraft = (patch: Partial<CreateWalletDraft>) => {
+    setCreateDraft((current) => ({ ...current, ...patch }));
+  };
+
+  // ==================================================
   // SELECTED WALLET
   // ==================================================
 
@@ -122,6 +148,7 @@ function WalletsPage() {
   const handleCreateWallet = () => {
     setSelectedWallet(null);
     setSelectedAsset(null);
+    setCreateDraft(emptyCreateDraft);
     setCurrentPage("create");
   };
 
@@ -149,33 +176,6 @@ function WalletsPage() {
     setSelectedWallet(null);
     setSelectedAsset(null);
     setCurrentPage("list");
-  };
-
-  // ==================================================
-  // OPEN BANK SELECTOR
-  // ==================================================
-
-  const handleSelectBank = () => {
-    setAssetSelectionReturnPage("create");
-    setCurrentPage("bank");
-  };
-
-  // ==================================================
-  // OPEN EWALLET SELECTOR
-  // ==================================================
-
-  const handleSelectEwallet = () => {
-    setAssetSelectionReturnPage("create");
-    setCurrentPage("ewallet");
-  };
-
-  // ==================================================
-  // OPEN CARD SELECTOR
-  // ==================================================
-
-  const handleSelectCard = () => {
-    setAssetSelectionReturnPage("create");
-    setCurrentPage("card");
   };
 
   // ==================================================
@@ -242,13 +242,20 @@ function WalletsPage() {
         }`}
       >
         <CreateWalletPage
-          selectedAsset={selectedAsset}
+          draft={createDraft}
+          onChange={updateCreateDraft}
           onBack={handleBackToList}
-          onSelectBank={handleSelectBank}
-          onSelectEwallet={handleSelectEwallet}
-          onSelectCard={handleSelectCard}
+          onSelectAssetType={() => setCurrentPage("assetType")}
+          onSelectCurrency={() => setCurrentPage("currency")}
           onSave={(data) => {
-            const newWallet = createWallet(data);
+            const newWallet = createWallet({
+              type: data.type,
+              assetId: data.assetId,
+              balance: data.balance,
+              currency: data.currency,
+              note: data.note,
+              includeInTotal: data.includeInTotal,
+            });
 
             saveWallet(newWallet);
 
@@ -318,6 +325,61 @@ function WalletsPage() {
       </div>
 
       {/* ================================================== */}
+      {/* ASSET TYPE SELECT */}
+      {/* ================================================== */}
+
+      <div
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+          currentPage === "assetType" ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <AssetTypeSelectPage
+          selected={createDraft.type}
+          onBack={() => setCurrentPage("create")}
+          onSelect={(type) => {
+            updateCreateDraft({
+              type,
+              assetId: undefined,
+              assetName: undefined,
+              assetIcon: undefined,
+            });
+
+            if (type === "bank") {
+              setAssetSelectionReturnPage("create");
+              setCurrentPage("bank");
+            } else if (type === "ewallet") {
+              setAssetSelectionReturnPage("create");
+              setCurrentPage("ewallet");
+            } else if (type === "card") {
+              setAssetSelectionReturnPage("create");
+              setCurrentPage("card");
+            } else {
+              setCurrentPage("create");
+            }
+          }}
+        />
+      </div>
+
+      {/* ================================================== */}
+      {/* CURRENCY SELECT */}
+      {/* ================================================== */}
+
+      <div
+        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+          currentPage === "currency" ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <CurrencySelectPage
+          selected={createDraft.currency}
+          onBack={() => setCurrentPage("create")}
+          onSelect={(code) => {
+            updateCreateDraft({ currency: code });
+            setCurrentPage("create");
+          }}
+        />
+      </div>
+
+      {/* ================================================== */}
       {/* BANK SELECT */}
       {/* ================================================== */}
 
@@ -335,6 +397,15 @@ function WalletsPage() {
               name: bank.name,
               icon: bank.icon,
             });
+
+            if (assetSelectionReturnPage === "create") {
+              updateCreateDraft({
+                type: "bank",
+                assetId: bank.id,
+                assetName: bank.name,
+                assetIcon: bank.icon,
+              });
+            }
 
             setCurrentPage(assetSelectionReturnPage);
           }}
@@ -360,6 +431,15 @@ function WalletsPage() {
               icon: ewallet.icon,
             });
 
+            if (assetSelectionReturnPage === "create") {
+              updateCreateDraft({
+                type: "ewallet",
+                assetId: ewallet.id,
+                assetName: ewallet.name,
+                assetIcon: ewallet.icon,
+              });
+            }
+
             setCurrentPage(assetSelectionReturnPage);
           }}
         />
@@ -383,6 +463,15 @@ function WalletsPage() {
               name: card.name,
               icon: card.icon,
             });
+
+            if (assetSelectionReturnPage === "create") {
+              updateCreateDraft({
+                type: "card",
+                assetId: card.id,
+                assetName: card.name,
+                assetIcon: card.icon,
+              });
+            }
 
             setCurrentPage(assetSelectionReturnPage);
           }}
