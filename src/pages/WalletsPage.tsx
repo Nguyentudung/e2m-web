@@ -25,6 +25,7 @@ import {
 
 import { getExchangeRates } from "@/services/exchangeRate";
 import type { ExchangeRates } from "@/types/exchangeRate";
+import { toast } from "@/components/ui/toast";
 
 type WalletPage =
   | "list"
@@ -46,6 +47,11 @@ interface SelectedAsset {
 }
 
 function WalletsPage() {
+  const sortWallets = (items: Wallet[]) =>
+    [...items].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   // ==================================================
   // EXCHANGE RATES
   // ==================================================
@@ -84,7 +90,7 @@ function WalletsPage() {
   // WALLETS
   // ==================================================
 
-  const [wallets, setWallets] = useState<Wallet[]>(getWallets);
+  const [wallets, setWallets] = useState<Wallet[]>(() => sortWallets(getWallets()));
 
   // ==================================================
   // SELECTED ASSET
@@ -261,7 +267,13 @@ function WalletsPage() {
 
             saveWallet(newWallet);
 
-            setWallets((currentWallets) => [...currentWallets, newWallet]);
+            setWallets((currentWallets) =>
+              sortWallets([...currentWallets, newWallet]),
+            );
+            toast.add({
+              title: "Đã tạo tài khoản",
+              type: "success",
+            });
 
             setSelectedAsset(null);
             setCurrentPage("list");
@@ -331,7 +343,7 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto ${
           currentPage === "assetType" ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -386,7 +398,7 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto ${
           currentPage === "bank" ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -419,7 +431,7 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto ${
           currentPage === "ewallet" ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -452,7 +464,7 @@ function WalletsPage() {
       {/* ================================================== */}
 
       <div
-        className={`absolute inset-0 overflow-y-auto transition-transform duration-300 ease-out ${
+        className={`absolute inset-0 overflow-y-auto ${
           currentPage === "card" ? "translate-x-0" : "translate-x-full"
         }`}
       >

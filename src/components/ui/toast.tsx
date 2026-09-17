@@ -30,7 +30,7 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
     <ToastPrimitive.Viewport
       data-slot="toast-viewport"
       className={cn(
-        "pointer-events-none fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-sm outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
+        "pointer-events-none fixed inset-x-4 top-[calc(1rem+env(safe-area-inset-top))] z-50 mx-auto w-auto max-w-sm outline-none sm:right-4 sm:left-auto sm:mx-0 sm:w-full",
         className
       )}
       {...props}
@@ -43,13 +43,13 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
     <ToastPrimitive.Root
       data-slot="toast"
       className={cn(
-        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl bg-popover text-popover-foreground will-change-transform outline-none select-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "group/toast pointer-events-auto absolute top-0 right-0 z-[calc(1000-var(--toast-index))] w-full origin-top rounded-full bg-taskbar-background text-white will-change-transform outline-none select-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
         "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
         "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
         "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
         "data-expanded:h-(--toast-height) data-expanded:[transform:translateX(var(--toast-swipe-movement-x))_translateY(var(--offset-y))]",
-        "data-limited:opacity-0 data-starting-style:[transform:translateY(150%)]",
-        "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(150%)]",
+        "data-limited:opacity-0 data-starting-style:[transform:translateY(-150%)]",
+        "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(-150%)]",
         "data-ending-style:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))]",
         "data-ending-style:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
         "data-ending-style:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
@@ -145,31 +145,36 @@ function ToastIcon({ type }: { type: string | undefined }) {
 
   if (type === "success") {
     icon = (
-      <HugeiconsIcon icon={CheckmarkCircle02Icon} size={16} aria-hidden="true" />
+      <HugeiconsIcon
+        icon={CheckmarkCircle02Icon}
+        size={24}
+        className="text-green-400"
+        aria-hidden="true"
+      />
     )
   }
 
   if (type === "info") {
     icon = (
-      <HugeiconsIcon icon={InformationCircleIcon} size={16} aria-hidden="true" />
+      <HugeiconsIcon icon={InformationCircleIcon} size={24} className="text-blue-400" aria-hidden="true" />
     )
   }
 
   if (type === "warning") {
     icon = (
-      <HugeiconsIcon icon={Alert02Icon} size={16} aria-hidden="true" />
+      <HugeiconsIcon icon={Alert02Icon} size={24} className="text-yellow-300" aria-hidden="true" />
     )
   }
 
   if (type === "error") {
     icon = (
-      <HugeiconsIcon icon={CancelCircleIcon} size={16} className="text-destructive" aria-hidden="true" />
+      <HugeiconsIcon icon={CancelCircleIcon} size={24} className="text-red-400" aria-hidden="true" />
     )
   }
 
   if (type === "loading") {
     icon = (
-      <HugeiconsIcon icon={Loading03Icon} size={16} className="animate-spin" aria-hidden="true" />
+      <HugeiconsIcon icon={Loading03Icon} size={24} className="animate-spin text-white" aria-hidden="true" />
     )
   }
 
@@ -180,7 +185,7 @@ function ToastIcon({ type }: { type: string | undefined }) {
   return (
     <span
       data-slot="toast-icon"
-      className="shrink-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
+      className="shrink-0 [&_svg]:pointer-events-none"
     >
       {icon}
     </span>
@@ -194,9 +199,8 @@ function ToastList() {
     <Toast key={toastItem.id} toast={toastItem}>
       <ToastContent>
         <ToastIcon type={toastItem.type} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 items-center">
           <ToastTitle />
-          <ToastDescription />
         </div>
         <ToastAction />
         <ToastClose />

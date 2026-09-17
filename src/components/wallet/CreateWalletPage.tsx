@@ -1,8 +1,10 @@
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useState } from "react";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Wallet01Icon,
+  Loading03Icon,
 } from "@hugeicons/core-free-icons";
 
 import { Button } from "@/components/ui/button";
@@ -60,6 +62,7 @@ function CreateWalletPage({
   onSelectCurrency,
   onSave,
 }: CreateWalletPageProps) {
+  const [isSaving, setIsSaving] = useState(false);
   const numericBalance = Number(draft.balance);
   const balanceValid =
     draft.balance !== "" &&
@@ -67,21 +70,25 @@ function CreateWalletPage({
     numericBalance >= 0;
   const assetSelected = draft.type === "cash" || Boolean(draft.assetId);
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSave = async () => {
+    if (!balanceValid || !assetSelected || isSaving) return;
 
-    if (!balanceValid || !assetSelected) return;
-
-    onSave({
-      type: draft.type,
-      assetId: draft.assetId,
-      assetName: draft.assetName,
-      assetIcon: draft.assetIcon,
-      balance: numericBalance,
-      currency: draft.currency,
-      note: draft.note.trim(),
-      includeInTotal: draft.includeInTotal,
-    });
+    setIsSaving(true);
+    try {
+      await new Promise((resolve) => window.setTimeout(resolve, 500));
+      onSave({
+        type: draft.type,
+        assetId: draft.assetId,
+        assetName: draft.assetName,
+        assetIcon: draft.assetIcon,
+        balance: numericBalance,
+        currency: draft.currency,
+        note: draft.note.trim(),
+        includeInTotal: draft.includeInTotal,
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const assetIcon = getAssetIcon(draft.type, draft.assetIcon);
@@ -104,9 +111,7 @@ function CreateWalletPage({
       </header>
 
       {/* ================= FORM ================= */}
-      <form
-        id="create-wallet-form"
-        onSubmit={handleSubmit}
+      <div
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4"
       >
         <div className="space-y-2">
@@ -209,17 +214,21 @@ function CreateWalletPage({
             />
           </div>
         </div>
-      </form>
+      </div>
 
       {/* ================= ACTION ================= */}
       <div className="shrink-0 bg-background px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
         <Button
-          type="submit"
-          form="create-wallet-form"
-          disabled={!balanceValid || !assetSelected}
+          type="button"
+          onClick={() => void handleSave()}
+          disabled={!balanceValid || !assetSelected || isSaving}
           className="h-12 w-full rounded-full font-bold"
         >
-          Lưu
+          {isSaving ? (
+            <HugeiconsIcon icon={Loading03Icon} size={19} className="animate-spin" />
+          ) : (
+            "Lưu"
+          )}
         </Button>
       </div>
     </section>

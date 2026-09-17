@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.jpg";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Menu11Icon } from "@hugeicons/core-free-icons";

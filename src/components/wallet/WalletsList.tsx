@@ -2,7 +2,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { PlusIcon, ViewIcon } from "@hugeicons/core-free-icons";
 
 import wallet from "@/assets/icons/wallet.svg";
-import logo from "@/assets/logo.png"; // <-- Import logo của bạn
+import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 
 import { resolveAsset } from "@/utils/assetIcons";
@@ -181,7 +181,13 @@ function WalletsList({
           ) : (
             /* WALLET CARDS */
             <div className="space-y-3">
-              {wallets.map((item) => {
+              {[...wallets]
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime(),
+                )
+                .map((item) => {
                 const asset = resolveAsset(
                   item.type,
                   item.assetId,
@@ -255,7 +261,7 @@ function WalletsList({
                     </div>
                   </button>
                 );
-              })}
+                })}
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft01Icon,
@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/toast";
 import { saveTransaction } from "@/services/transactionService";
 import { getCurrencySymbol } from "@/utils/currency";
 import { getWallets, type Wallet } from "@/types/wallets";
+import { resolveAsset } from "@/utils/assetIcons";
 import { AnimatedAmount } from "@/components/transactions/AnimatedAmount";
 
 export interface TransactionDraft {
@@ -80,7 +81,7 @@ export default function AddTransactionPage() {
   const [type, setType] = useState<"income" | "expense">(initial?.type ?? "expense");
   const [amountText, setAmountText] = useState(initial?.amountText ?? "0");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
-  const [walletId] = useState(initial?.walletId ?? "");
+  const [walletId, setWalletId] = useState(initial?.walletId ?? "");
   const [note, setNote] = useState(initial?.note ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO);
   const [time, setTime] = useState(initial?.time ?? currentTime);
@@ -88,11 +89,23 @@ export default function AddTransactionPage() {
   const [noteFocused, setNoteFocused] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
 
+  useEffect(() => {
+    setWalletId(initial?.walletId ?? "");
+  }, [initial?.walletId]);
+
   const amount = Number(amountText) || 0;
   const formattedAmount = amount.toLocaleString("vi-VN");
   const categories = getCategoriesByType(type);
   const wallets = useMemo(() => getWallets(), []);
   const wallet = wallets.find((w) => w.id === walletId);
+  const walletAsset = wallet
+    ? resolveAsset(
+        wallet.type,
+        wallet.assetId,
+        wallet.assetName,
+        wallet.assetIcon,
+      )
+    : null;
 
   const draft = (): TransactionDraft => ({
     type,
@@ -154,7 +167,7 @@ export default function AddTransactionPage() {
       <header className="relative flex shrink-0 items-center px-4 pt-4 pb-3">
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/home", { replace: true })}
           aria-label="Quay lại"
           className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface transition active:scale-95"
         >
@@ -168,7 +181,7 @@ export default function AddTransactionPage() {
       {/* ================= CONTENT ================= */}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
         {/* LOẠI GIAO DỊCH */}
-        <div className="mt-2 grid grid-cols-2 border-b border-border">
+        <div className="mt-2 grid grid-cols-2">
           {(["expense", "income"] as const).map((item) => (
             <button
               key={item}
@@ -177,7 +190,7 @@ export default function AddTransactionPage() {
                 setType(item);
                 if (!categories.some((entry) => entry.id === categoryId)) setCategoryId("");
               }}
-              className="relative h-11 border-b-2 border-transparent text-sm font-semibold text-text-primary"
+              className="relative h-11 text-sm font-semibold text-text-primary"
             >
               {item === "expense" ? "Chi tiêu" : "Thu nhập"}
               <span
@@ -205,7 +218,7 @@ export default function AddTransactionPage() {
             onBlur={() => setNoteFocused(false)}
             placeholder={noteFocused ? "" : "Thêm ghi chú"}
             aria-label="Ghi chú giao dịch"
-            className="mt-4 w-full border-b border-border bg-transparent px-2 py-2 text-center text-base outline-none placeholder:text-text-secondary focus:placeholder:text-transparent caret-primary focus:border-primary"
+            className="mt-4 w-full bg-transparent px-2 py-2 text-center text-base outline-none placeholder:text-text-secondary focus:placeholder:text-transparent caret-primary"
           />
         </div>
 
@@ -216,12 +229,20 @@ export default function AddTransactionPage() {
           className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
         >
           <span className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-            <HugeiconsIcon
-              icon={Wallet01Icon}
-              size={20}
-              strokeWidth={1.8}
-              className={wallet ? "text-primary" : "text-text-secondary"}
-            />
+            {walletAsset?.icon ? (
+              <img
+                src={walletAsset.icon}
+                alt=""
+                className="size-7 rounded-md object-contain"
+              />
+            ) : (
+              <HugeiconsIcon
+                icon={Wallet01Icon}
+                size={20}
+                strokeWidth={1.8}
+                className={wallet ? "text-primary" : "text-text-secondary"}
+              />
+            )}
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-xs text-text-secondary">Tài khoản</span>

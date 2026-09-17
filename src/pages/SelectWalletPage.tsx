@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft01Icon,
@@ -24,7 +24,20 @@ function SelectWalletPage() {
   const draft = state?.draft;
   const wallets = useMemo(() => getWallets(), []);
 
-  const choose = (walletId: string) =>
+  // 1. Khởi tạo state
+  const [selectedWalletId, setSelectedWalletId] = useState(draft?.walletId ?? "");
+
+  // 2. Lưu lại walletId từ draft trước đó để so sánh
+  const [prevDraftWalletId, setPrevDraftWalletId] = useState(draft?.walletId);
+
+  // 3. Đồng bộ state trực tiếp trong lúc render nếu draft.walletId từ bên ngoài thay đổi (Thay thế cho useEffect)
+  if (draft?.walletId !== prevDraftWalletId) {
+    setPrevDraftWalletId(draft?.walletId);
+    setSelectedWalletId(draft?.walletId ?? "");
+  }
+
+  const choose = (walletId: string) => {
+    setSelectedWalletId(walletId);
     navigate("/add", {
       replace: true,
       state: {
@@ -40,6 +53,7 @@ function SelectWalletPage() {
         },
       },
     });
+  };
 
   return (
     <section className="mx-auto min-h-[100dvh] w-full max-w-2xl px-4 pb-10 pt-5">
@@ -60,7 +74,7 @@ function SelectWalletPage() {
       {wallets.length ? (
         <div className="space-y-2">
           {wallets.map((wallet) => {
-            const selected = wallet.id === draft?.walletId;
+            const selected = wallet.id === selectedWalletId;
             const asset = resolveAsset(
               wallet.type,
               wallet.assetId,
@@ -72,17 +86,13 @@ function SelectWalletPage() {
                 key={wallet.id}
                 type="button"
                 onClick={() => choose(wallet.id)}
-                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-4 text-left transition-colors ${
+                className={`flex w-full items-center gap-3 rounded-2xl border-2 bg-surface px-4 py-4 text-left text-text-primary transition-all ${
                   selected
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-surface text-text-primary"
+                    ? "border-dashed border-primary ring-1 ring-primary/20"
+                    : "border-solid border-transparent hover:border-surface-secondary"
                 }`}
               >
-                <span
-                  className={`flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl ${
-                    selected ? "bg-primary-400/40" : "bg-surface-secondary"
-                  }`}
-                >
+                <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-secondary">
                   {asset.icon ? (
                     <img src={asset.icon} alt="" className="size-7 rounded-md object-contain" />
                   ) : (
@@ -93,11 +103,7 @@ function SelectWalletPage() {
                   <span className="block truncate font-semibold">
                     {asset.name}
                   </span>
-                  <span
-                    className={`block text-xs ${
-                      selected ? "text-primary-foreground/75" : "text-text-secondary"
-                    }`}
-                  >
+                  <span className="block text-xs text-text-secondary">
                     {TYPE_LABELS[wallet.type]}
                   </span>
                 </span>
@@ -133,4 +139,5 @@ function SelectWalletPage() {
     </section>
   );
 }
+
 export default SelectWalletPage;

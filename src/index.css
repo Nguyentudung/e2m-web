@@ -76,7 +76,7 @@ body,
 ======================================== */
 
 @theme {
-  /* PRIMARY - PURPLE */
+  /* PRIMARY */
 
   --color-primary-100: #e3e0e0;
   --color-primary-200: #f0eeee;
@@ -480,12 +480,6 @@ html.dark .logo-dark-image {
 ======================================== */
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-    border-color: transparent !important;
-    box-shadow: none !important;
-  }
-
   html {
     @apply font-sans;
   }
