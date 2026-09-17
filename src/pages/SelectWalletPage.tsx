@@ -7,7 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { getWallets, type Wallet } from "@/types/wallets";
-import { getAssetIcon } from "@/utils/assetIcons";
+import { resolveAsset } from "@/utils/assetIcons";
 import { formatCurrency } from "@/utils/currency";
 import type { TransactionDraft } from "@/pages/AddTransactionPage";
 
@@ -22,7 +22,7 @@ function SelectWalletPage() {
   const navigate = useNavigate();
   const state = useLocation().state as { draft?: TransactionDraft } | null;
   const draft = state?.draft;
-  const wallets = useMemo(getWallets, []);
+  const wallets = useMemo(() => getWallets(), []);
 
   const choose = (walletId: string) =>
     navigate("/add", {
@@ -61,7 +61,12 @@ function SelectWalletPage() {
         <div className="space-y-2">
           {wallets.map((wallet) => {
             const selected = wallet.id === draft?.walletId;
-            const icon = getAssetIcon(wallet.type, wallet.assetIcon);
+            const asset = resolveAsset(
+              wallet.type,
+              wallet.assetId,
+              wallet.assetName,
+              wallet.assetIcon,
+            );
             return (
               <button
                 key={wallet.id}
@@ -78,15 +83,15 @@ function SelectWalletPage() {
                     selected ? "bg-primary-400/40" : "bg-surface-secondary"
                   }`}
                 >
-                  {icon ? (
-                    <img src={icon} alt="" className="size-7 rounded-md object-contain" />
+                  {asset.icon ? (
+                    <img src={asset.icon} alt="" className="size-7 rounded-md object-contain" />
                   ) : (
                     <HugeiconsIcon icon={Wallet01Icon} size={21} strokeWidth={1.8} />
                   )}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">
-                    {wallet.assetName ?? wallet.assetId ?? TYPE_LABELS[wallet.type]}
+                    {asset.name}
                   </span>
                   <span
                     className={`block text-xs ${

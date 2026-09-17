@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 
 import { useNavigation } from "../contexts/NavigationContext";
 
@@ -251,6 +251,8 @@ function WalletsPage() {
             const newWallet = createWallet({
               type: data.type,
               assetId: data.assetId,
+              assetName: data.assetName,
+              assetIcon: data.assetIcon,
               balance: data.balance,
               currency: data.currency,
               note: data.note,

@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
-  Calendar03Icon,
-  Note01Icon,
   Wallet01Icon,
   ArrowUp02Icon,
   ArrowDown02Icon,
@@ -12,7 +10,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Drawer,
   DrawerContent,
@@ -22,10 +19,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { vi } from "react-day-picker/locale";
 import NumberPad from "@/components/transactions/NumberPad";
-import { getCategoryById } from "@/constants/categories";
+import { getCategoriesByType } from "@/constants/categories";
+import CategoryPicker from "@/components/transactions/CategoryPicker";
 import { toast } from "@/components/ui/toast";
 import { saveTransaction } from "@/services/transactionService";
-import { formatCurrency } from "@/utils/currency";
+import { getCurrencySymbol } from "@/utils/currency";
 import { getWallets, type Wallet } from "@/types/wallets";
 
 export interface TransactionDraft {
@@ -62,13 +60,6 @@ function shiftDays(iso: string, days: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function dateLabel(iso: string, time: string): string {
-  if (iso === todayISO()) return `Hôm nay · ${time}`;
-  const d = parseDate(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} · ${time}`;
-}
-
 function walletName(wallet?: Wallet): string {
   if (!wallet) return "Chọn tài khoản";
   return (
@@ -78,25 +69,26 @@ function walletName(wallet?: Wallet): string {
   );
 }
 
-function AddTransactionPage() {
+export default function AddTransactionPage() {
   const navigate = useNavigate();
   const state = useLocation().state as { draft?: TransactionDraft } | null;
   const initial = state?.draft;
 
   const [type, setType] = useState<"income" | "expense">(initial?.type ?? "expense");
   const [amountText, setAmountText] = useState(initial?.amountText ?? "0");
-  const [categoryId] = useState(initial?.categoryId ?? "");
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
   const [walletId] = useState(initial?.walletId ?? "");
   const [note, setNote] = useState(initial?.note ?? "");
   const [date, setDate] = useState(initial?.date ?? todayISO);
   const [time, setTime] = useState(initial?.time ?? currentTime);
 
-  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteFocused, setNoteFocused] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
 
   const amount = Number(amountText) || 0;
-  const category = getCategoryById(categoryId);
-  const wallets = useMemo(getWallets, []);
+  const formattedAmount = amount.toLocaleString("vi-VN");
+  const categories = getCategoriesByType(type);
+  const wallets = useMemo(() => getWallets(), []);
   const wallet = wallets.find((w) => w.id === walletId);
 
   const draft = (): TransactionDraft => ({
@@ -173,189 +165,87 @@ function AddTransactionPage() {
       {/* ================= CONTENT ================= */}
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
         {/* LOẠI GIAO DỊCH */}
-        <div className="mt-2 grid grid-cols-2 rounded-xl bg-surface p-1">
+        <div className="mt-2 grid grid-cols-2 border-b border-border">
           {(["expense", "income"] as const).map((item) => (
             <button
               key={item}
               type="button"
-              onClick={() => setType(item)}
-              className={`h-11 rounded-lg text-sm font-semibold transition-colors ${
-                type === item
-                  ? "bg-primary text-primary-foreground"
-                  : "text-text-secondary"
-              }`}
+              onClick={() => {
+                setType(item);
+                if (!categories.some((entry) => entry.id === categoryId)) setCategoryId("");
+              }}
+              className="relative h-11 border-b-2 border-transparent text-sm font-semibold text-text-primary"
             >
               {item === "expense" ? "Chi tiêu" : "Thu nhập"}
+              <span
+                aria-hidden="true"
+                className={`absolute bottom-[-2px] left-1/2 h-0.5 w-12 -translate-x-1/2 origin-center rounded-full bg-primary transition-transform duration-300 ease-out ${
+                  type === item ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
             </button>
           ))}
         </div>
-
-        {/* SỐ TIỀN */}
-        <div className="py-8 text-center">
-          <p className="break-all text-5xl font-bold tracking-tight">
-            {formatCurrency(amount, "VND")}
+        <div className="py-6 text-center">
+          <p className="break-all text-5xl font-bold tracking-tight tabular-nums">
+            {formattedAmount} {getCurrencySymbol("VND")}
           </p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-text-secondary">
-            VND
-          </p>
+          <input
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+            onFocus={() => setNoteFocused(true)}
+            onBlur={() => setNoteFocused(false)}
+            placeholder={noteFocused ? "" : "Thêm ghi chú"}
+            aria-label="Ghi chú giao dịch"
+            className="mt-4 w-full border-b border-border bg-transparent px-2 py-2 text-center text-base outline-none placeholder:text-text-secondary focus:placeholder:text-transparent caret-primary focus:border-primary"
+          />
         </div>
-
-        {/* CÁC HÀNG LỰA CHỌN */}
-        <div className="space-y-2">
-          <button
-            type="button"
-            onClick={() => goTo("/add/category")}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
-          >
-            <span
-              className="flex size-10 items-center justify-center rounded-xl"
-              style={{ backgroundColor: (category?.color ?? "var(--chart-5)") + "22" }}
-            >
-              {category && (
-                <HugeiconsIcon
-                  icon={category.icon}
-                  size={20}
-                  strokeWidth={1.8}
-                  color={category.color}
-                />
-              )}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-xs text-text-secondary">Danh mục</span>
-              <span className="block truncate font-semibold">
-                {category?.name ?? "Chọn danh mục"}
-              </span>
-            </span>
+        <button
+          type="button"
+          onClick={() => goTo("/add/wallet")}
+          className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
+        >
+          <span className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
             <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              size={18}
-              className="shrink-0 text-text-tertiary"
+              icon={Wallet01Icon}
+              size={20}
+              strokeWidth={1.8}
+              className={wallet ? "text-primary" : "text-text-secondary"}
             />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => goTo("/add/wallet")}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
-          >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-              <HugeiconsIcon
-                icon={Wallet01Icon}
-                size={20}
-                strokeWidth={1.8}
-                className={wallet ? "text-primary" : "text-text-secondary"}
-              />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-xs text-text-secondary">Tài khoản</span>
-              <span className="block truncate font-semibold">
-                {walletName(wallet)}
-              </span>
-            </span>
-            <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              size={18}
-              className="shrink-0 text-text-tertiary"
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setNoteOpen(true)}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
-          >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-              <HugeiconsIcon
-                icon={Note01Icon}
-                size={20}
-                strokeWidth={1.8}
-                className="text-text-secondary"
-              />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-xs text-text-secondary">Ghi chú</span>
-              <span className="block truncate font-semibold">
-                {note.trim() || "Thêm ghi chú"}
-              </span>
-            </span>
-            <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              size={18}
-              className="shrink-0 text-text-tertiary"
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setDateOpen(true)}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl bg-surface px-4 text-left"
-          >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-surface-secondary">
-              <HugeiconsIcon
-                icon={Calendar03Icon}
-                size={20}
-                strokeWidth={1.8}
-                className="text-text-secondary"
-              />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-xs text-text-secondary">Ngày giao dịch</span>
-              <span className="block truncate font-semibold">
-                {dateLabel(date, time)}
-              </span>
-            </span>
-            <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              size={18}
-              className="shrink-0 text-text-tertiary"
-            />
-          </button>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs text-text-secondary">Tài khoản</span>
+            <span className="block truncate font-semibold">{walletName(wallet)}</span>
+          </span>
+          <HugeiconsIcon icon={ArrowRight01Icon} size={18} className="shrink-0 text-text-tertiary" />
+        </button>
+        <div className="mt-4 pb-2">
+          <p className="mb-2 px-1 text-sm font-semibold text-text-secondary">Danh mục</p>
+          <CategoryPicker categories={categories} selected={categoryId} onSelect={setCategoryId} />
         </div>
       </div>
 
       {/* ================= KEYPAD ================= */}
-      <div className="shrink-0 px-2 pb-[calc(10px+env(safe-area-inset-bottom))] pt-1">
-        <NumberPad
-          value={amountText}
-          onChange={setAmountText}
-          onToday={() => setDateOpen(true)}
-          onOperator={(operator) => setType(operator)}
-          onConfirm={save}
-        />
-      </div>
-
-      {/* ================= GHI CHÚ DRAWER ================= */}
-      <Drawer open={noteOpen} onOpenChange={setNoteOpen}>
-        <DrawerContent className="mx-auto max-w-2xl rounded-t-3xl bg-background">
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="text-lg font-bold">Ghi chú</DrawerTitle>
-          </DrawerHeader>
-          <div className="px-4 pb-6">
-            <Textarea
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder="Ví dụ: ăn trưa với đồng nghiệp..."
-              rows={4}
-              className="min-h-24 rounded-xl bg-surface px-4 py-3 text-base"
-              autoFocus
-            />
-            <Button
-              onClick={() => setNoteOpen(false)}
-              className="mt-4 h-12 w-full rounded-xl text-base"
-            >
-              Xong
-            </Button>
-          </div>
-        </DrawerContent>
-      </Drawer>
+      {!noteFocused && (
+        <div className="shrink-0 px-2 pb-[calc(10px+env(safe-area-inset-bottom))] pt-1">
+          <NumberPad
+            value={amountText}
+            onChange={setAmountText}
+            onToday={() => setDateOpen(true)}
+            onOperator={(operator) => setType(operator)}
+            onConfirm={save}
+          />
+        </div>
+      )}
 
       {/* ================= NGÀY GIAO DỊCH DRAWER ================= */}
       <Drawer open={dateOpen} onOpenChange={setDateOpen}>
-        <DrawerContent className="mx-auto max-w-2xl rounded-t-3xl bg-background">
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="text-lg font-bold">Ngày giao dịch</DrawerTitle>
-          </DrawerHeader>
-          <div className="flex flex-col items-center gap-4 px-4 pb-6">
+        <DrawerContent className="mx-auto h-[min(94dvh,48rem)] max-h-[94dvh] max-w-2xl overflow-hidden rounded-t-3xl bg-background [&_[data-slot=drawer-content]]:overflow-y-auto [&_[data-slot=drawer-content]]:overscroll-contain [&_[data-slot=drawer-content]]:touch-pan-y">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y">
+            <DrawerHeader className="text-left">
+              <DrawerTitle className="text-lg font-bold">Ngày giao dịch</DrawerTitle>
+            </DrawerHeader>
+            <div className="flex flex-col items-center gap-4 px-4 pb-6">
             <Calendar
               mode="single"
               selected={parseDate(date)}
@@ -421,6 +311,7 @@ function AddTransactionPage() {
               <HugeiconsIcon icon={Tick02Icon} size={20} strokeWidth={2.2} />
               Xong
             </Button>
+            </div>
           </div>
         </DrawerContent>
       </Drawer>
@@ -467,5 +358,3 @@ function TimeSpinner({
     </div>
   );
 }
-
-export default AddTransactionPage;

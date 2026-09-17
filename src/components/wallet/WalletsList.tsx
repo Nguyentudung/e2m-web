@@ -5,9 +5,7 @@ import wallet from "@/assets/icons/wallet.svg";
 import logo from "@/assets/logo.png"; // <-- Import logo của bạn
 import { Button } from "@/components/ui/button";
 
-import { banks } from "@/data/banks";
-import { ewallets } from "@/data/ewallets";
-import { getAssetIcon } from "@/utils/assetIcons";
+import { resolveAsset } from "@/utils/assetIcons";
 import { formatCurrency } from "@/utils/currency";
 
 import type { Wallet } from "@/types/wallets";
@@ -48,26 +46,6 @@ function WalletsList({
         }, 0);
 
   const displayCurrency = "VND";
-
-  /* ================================================== */
-  /* GET ASSET METADATA */
-  /* ================================================== */
-
-  const getAssetMetadata = (item: Wallet) => {
-    if (!item.assetId) {
-      return null;
-    }
-
-    if (item.type === "bank") {
-      return banks.find((asset) => asset.id === item.assetId);
-    }
-
-    if (item.type === "ewallet") {
-      return ewallets.find((asset) => asset.id === item.assetId);
-    }
-
-    return null;
-  };
 
   /* ================================================== */
   /* WALLET TYPE LABEL */
@@ -204,13 +182,12 @@ function WalletsList({
             /* WALLET CARDS */
             <div className="space-y-3">
               {wallets.map((item) => {
-                const asset = getAssetMetadata(item);
-                const assetIcon = getAssetIcon(item.type, asset?.icon);
-                const assetName =
-                  asset?.name ??
-                  (item.type === "cash"
-                    ? "Tiền mặt"
-                    : (item.assetId ?? "Tài sản"));
+                const asset = resolveAsset(
+                  item.type,
+                  item.assetId,
+                  item.assetName,
+                  item.assetIcon,
+                );
 
                 const assetType = getWalletTypeLabel(item.type);
 
@@ -235,10 +212,10 @@ function WalletsList({
                         <div className="flex items-center gap-3">
                           {/* ICON */}
                           <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface">
-                            {assetIcon ? (
+                            {asset.icon ? (
                               <img
-                                src={assetIcon}
-                                alt={assetName}
+                                src={asset.icon}
+                                alt={asset.name}
                                 className="size-8 object-contain"
                               />
                             ) : (
@@ -253,7 +230,7 @@ function WalletsList({
                           {/* NAME + NOTE */}
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-base font-semibold text-text-primary">
-                              {assetName}
+                              {asset.name}
                             </p>
 
                             {item.note && (

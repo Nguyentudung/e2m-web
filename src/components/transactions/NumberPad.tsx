@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Delete02Icon,
+  Eraser01Icon,
   PlusSignIcon,
   MinusSignIcon,
   Tick02Icon,
@@ -55,7 +55,7 @@ export default function NumberPad({
     { kind: "digit", label: "1", value: "1" },
     { kind: "digit", label: "2", value: "2" },
     { kind: "digit", label: "3", value: "3" },
-    { kind: "action", label: "Xóa ký tự", onPress: backspace },
+    { kind: "action", label: "Xóa số", onPress: backspace },
     { kind: "digit", label: "4", value: "4" },
     { kind: "digit", label: "5", value: "5" },
     { kind: "digit", label: "6", value: "6" },
@@ -71,10 +71,10 @@ export default function NumberPad({
   ];
 
   const baseClass =
-    "flex h-16 items-center justify-center rounded-2xl select-none touch-manipulation transition-colors duration-100 sm:h-[4.5rem]";
+    "flex h-[clamp(3.25rem,13vw,4.5rem)] items-center justify-center rounded-2xl select-none touch-manipulation transition-colors duration-100";
 
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
       {keys.map((key, index) => {
         const isConfirm = index === keys.length - 1;
 
@@ -110,7 +110,14 @@ export default function NumberPad({
             }
             aria-label={key.label}
           >
-            {index === 3 && <HugeiconsIcon icon={Delete02Icon} size={24} strokeWidth={2} />}
+            {index === 3 && (
+              <HugeiconsIcon
+                icon={Eraser01Icon}
+                size={24}
+                strokeWidth={2}
+                className="rotate-180"
+              />
+            )}
             {index === 7 && <HugeiconsIcon icon={PlusSignIcon} size={24} strokeWidth={2} />}
             {index === 11 && <HugeiconsIcon icon={MinusSignIcon} size={24} strokeWidth={2} />}
             {index === 14 && <HugeiconsIcon icon={Calendar03Icon} size={24} strokeWidth={1.8} />}

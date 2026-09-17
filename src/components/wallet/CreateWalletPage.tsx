@@ -28,6 +28,8 @@ export interface CreateWalletDraft {
 export interface CreateWalletResult {
   type: AssetType;
   assetId?: string;
+  assetName?: string;
+  assetIcon?: string;
   balance: number;
   currency: string;
   note: string;
@@ -73,6 +75,8 @@ function CreateWalletPage({
     onSave({
       type: draft.type,
       assetId: draft.assetId,
+      assetName: draft.assetName,
+      assetIcon: draft.assetIcon,
       balance: numericBalance,
       currency: draft.currency,
       note: draft.note.trim(),
