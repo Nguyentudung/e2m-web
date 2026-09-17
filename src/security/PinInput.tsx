@@ -34,15 +34,19 @@ export function PinInput({
       disabled={disabled}
       data-security-pin-input=""
       aria-label={ariaLabel ?? "Mã PIN 6 chữ số"}
-      containerClassName="flex justify-center gap-2"
+      containerClassName="flex justify-center gap-1.5 sm:gap-2"
       render={({ slots }) => (
         <>
           {slots.map((slot, index) => (
             <div
               key={index}
-              className="flex size-11 items-center justify-center rounded-xl border border-border bg-surface text-lg font-bold text-text-primary sm:size-12"
+              className={`flex size-12 items-center justify-center rounded-[14px] border bg-surface text-lg font-bold text-text-primary transition-colors sm:size-[52px] ${
+                slot.isActive
+                  ? "border-primary ring-2 ring-primary/15"
+                  : "border-border"
+              }`}
             >
-              {slot.char ?? (slot.hasFakeCaret ? "|" : "")}
+              {slot.char ?? (slot.hasFakeCaret ? <span className="h-5 w-0.5 bg-primary" /> : null)}
             </div>
           ))}
         </>

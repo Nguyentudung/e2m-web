@@ -7,12 +7,12 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { PinInput } from "./PinInput";
 import { createPinSecret, isValidPin } from "./pin";
@@ -29,7 +29,9 @@ interface SecurityDialogProps {
 
 export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
   const { settings, refresh, unlockWithPin } = useSecurity();
-  const [step, setStep] = useState<Step>("overview");
+  const [step, setStep] = useState<Step>(() =>
+    settings?.enabled ? "overview" : "setup",
+  );
   const [pin, setPin] = useState("");
   const [newPin, setNewPin] = useState("");
   const [error, setError] = useState("");
@@ -141,36 +143,51 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
     const isVerify = step === "verify";
     return (
       <>
-        <DialogHeader>
-          <DialogTitle>
-            {isVerify ? "Xác thực để tiếp tục" : isConfirm ? "Xác nhận mã PIN" : "Thiết lập khóa bảo mật"}
-          </DialogTitle>
-          <DialogDescription>
-            {isVerify
-              ? "Nhập mã PIN e2m hiện tại."
-              : isConfirm
-                ? "Nhập lại mã PIN 6 chữ số của bạn."
-                : "Tạo mã PIN 6 chữ số để bảo vệ e2m."}
-          </DialogDescription>
-        </DialogHeader>
-        <PinInput value={pin} onChange={setPin} disabled={busy} />
-        {error && <p className="text-center text-sm text-destructive">{error}</p>}
-        <Button onClick={isVerify ? verifyCurrent : handleSetupPin} disabled={busy || pin.length !== 6} className="w-full">
-          {busy ? "Đang xử lý..." : isVerify ? "Xác nhận" : isConfirm ? "Hoàn tất" : "Tiếp tục"}
-        </Button>
+        <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-2.5">
+          <div className="space-y-1 text-center">
+            <h2 className="text-lg font-bold text-text-primary">
+              {isVerify ? "Xác thực để tiếp tục" : isConfirm ? "Xác nhận mã PIN" : "Tạo mã PIN e2m"}
+            </h2>
+            <p className="text-sm leading-6 text-text-secondary">
+              {isVerify
+                ? "Nhập mã PIN e2m hiện tại."
+                : isConfirm
+                  ? "Nhập lại 6 chữ số để xác nhận mã PIN."
+                  : "Tạo mã PIN 6 chữ số để bảo vệ dữ liệu của bạn."}
+            </p>
+          </div>
+          <PinInput value={pin} onChange={setPin} disabled={busy} />
+          <div className="min-h-4 text-center text-sm text-destructive">
+            {error}
+          </div>
+          <Button
+            onClick={isVerify ? verifyCurrent : handleSetupPin}
+            disabled={busy || pin.length !== 6}
+            className="h-11 w-full rounded-full"
+          >
+            {busy ? "Đang xử lý..." : isVerify ? "Xác nhận" : isConfirm ? "Hoàn tất" : "Tiếp tục"}
+          </Button>
+        </div>
       </>
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">
+    <Drawer
+      open={open}
+      onOpenChange={onOpenChange}
+      showSwipeHandle
+      swipeDirection="down"
+    >
+      <DrawerContent className="max-h-[min(88dvh,44rem)] rounded-t-[28px] !border-0 !border-transparent bg-background sm:mx-auto sm:max-w-lg">
+        <div className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-7">
         {step === "overview" && settings?.enabled ? (
           <>
-            <DialogHeader>
-              <DialogTitle>Khóa bảo mật</DialogTitle>
-              <DialogDescription>Đã bật bảo vệ cho e2m.</DialogDescription>
-            </DialogHeader>
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle>Khóa bảo mật</DrawerTitle>
+              <DrawerDescription>Đã bật bảo vệ cho e2m.</DrawerDescription>
+            </DrawerHeader>
             <div className="space-y-2">
               <div className="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-sm">
                 <span className="font-medium">Sinh trắc học</span>
@@ -191,10 +208,10 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
           </>
         ) : step === "biometric" ? (
           <>
-            <DialogHeader>
-              <DialogTitle>Bật sinh trắc học</DialogTitle>
-              <DialogDescription>Sử dụng vân tay, khuôn mặt hoặc phương thức xác thực được thiết bị hỗ trợ để mở khóa e2m nhanh hơn.</DialogDescription>
-            </DialogHeader>
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle>Bật sinh trắc học</DrawerTitle>
+              <DrawerDescription>Sử dụng vân tay, khuôn mặt hoặc phương thức xác thực được thiết bị hỗ trợ để mở khóa e2m nhanh hơn.</DrawerDescription>
+            </DrawerHeader>
             <HugeiconsIcon icon={FingerPrintIcon} size={48} className="mx-auto text-primary" />
             {error && <p className="text-center text-sm text-destructive">{error}</p>}
             <Button onClick={handleBiometric} disabled={busy} className="w-full">Bật sinh trắc học</Button>
@@ -202,17 +219,17 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
           </>
         ) : step === "new-pin" ? (
           <>
-            <DialogHeader>
-              <DialogTitle>Đổi mã PIN</DialogTitle>
-              <DialogDescription>Nhập mã PIN e2m mới gồm 6 chữ số.</DialogDescription>
-            </DialogHeader>
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle>Đổi mã PIN</DrawerTitle>
+              <DrawerDescription>Nhập mã PIN e2m mới gồm 6 chữ số.</DrawerDescription>
+            </DrawerHeader>
             <PinInput value={newPin} onChange={setNewPin} disabled={busy} />
             {error && <p className="text-center text-sm text-destructive">{error}</p>}
             <Button onClick={() => { if (!isValidPin(newPin)) { setError("Vui lòng nhập đủ 6 chữ số."); return; } setPin(""); setError(""); setStep("new-confirm"); }} disabled={newPin.length !== 6} className="w-full">Tiếp tục</Button>
           </>
         ) : step === "new-confirm" ? (
           <>
-            <DialogHeader><DialogTitle>Xác nhận mã PIN mới</DialogTitle><DialogDescription>Nhập lại mã PIN mới của bạn.</DialogDescription></DialogHeader>
+            <DrawerHeader className="p-0 text-left"><DrawerTitle>Xác nhận mã PIN mới</DrawerTitle><DrawerDescription>Nhập lại mã PIN mới của bạn.</DrawerDescription></DrawerHeader>
             <PinInput value={pin} onChange={setPin} disabled={busy} />
             {error && <p className="text-center text-sm text-destructive">{error}</p>}
             <Button onClick={confirmPin} disabled={busy || pin.length !== 6} className="w-full">Cập nhật mã PIN</Button>
@@ -225,7 +242,9 @@ export function SecurityDialog({ open, onOpenChange }: SecurityDialogProps) {
         {step === "verify" && (
           <Button variant="ghost" onClick={() => setStep("overview")}><HugeiconsIcon icon={ArrowLeft01Icon} size={18} /> Quay lại</Button>
         )}
-      </DialogContent>
-    </Dialog>
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
