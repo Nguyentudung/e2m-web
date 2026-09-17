@@ -1,4 +1,5 @@
-﻿import { motion } from "framer-motion";
+﻿import { useRef, useCallback, useEffect } from "react";
+import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Eraser01Icon,
@@ -9,8 +10,8 @@ import {
 } from "@hugeicons/core-free-icons";
 
 interface NumberPadProps {
-  value: string;
-  onChange: (value: string) => void;
+  value?: string; // Để optional nếu nơi khác vẫn truyền prop này vào
+  onChange: React.Dispatch<React.SetStateAction<string>>;
   onToday?: () => void;
   onOperator?: (operator: "income" | "expense") => void;
   onConfirm?: () => void;
@@ -26,36 +27,74 @@ interface DigitKey {
 interface ActionKey {
   kind: "action";
   label: string;
-  onPress: () => void;
+  onPress?: () => void;
+  isDelete?: boolean;
 }
 
 type PadKey = DigitKey | ActionKey;
 
 export default function NumberPad({
-  value,
   onChange,
   onToday,
   onOperator,
   onConfirm,
   maxDigits = 13,
 }: NumberPadProps) {
-  const pressDigit = (key: string) => {
-    const raw = value === "0" ? key : value + key;
-    const normalized = raw.replace(/^0+(\d)/, "$1");
-    const digitCount = normalized.replace(".", "").length;
-    if (digitCount > maxDigits) return;
-    onChange(normalized);
-  };
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isLongPressRef = useRef(false);
 
-  const backspace = () => {
-    onChange(value.length > 1 ? value.slice(0, -1) : "0");
+  // 1. Logic xóa 1 ký tự
+  const backspace = useCallback(() => {
+    onChange((prev) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
+  }, [onChange]);
+
+  // 2. Dừng timer nhấn giữ
+  const stopDelete = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  // 3. Bắt đầu nhấn giữ
+  const startDelete = useCallback(() => {
+    stopDelete();
+    isLongPressRef.current = false;
+
+    // Đợi 300ms nếu vẫn đè nút thì coi là nhấn giữ và liên tục xóa mỗi 60ms
+    timerRef.current = setTimeout(() => {
+      isLongPressRef.current = true;
+      intervalRef.current = setInterval(() => {
+        onChange((prev: string) => (prev.length > 1 ? prev.slice(0, -1) : "0"));
+      }, 60);
+    }, 300);
+  }, [onChange, stopDelete]);
+
+  // Cleanup khi component unmount
+  useEffect(() => {
+    return () => stopDelete();
+  }, [stopDelete]);
+
+  const pressDigit = (key: string) => {
+    onChange((prev) => {
+      const raw = prev === "0" ? key : prev + key;
+      const normalized = raw.replace(/^0+(\d)/, "$1");
+      const digitCount = normalized.replace(".", "").length;
+      if (digitCount > maxDigits) return prev;
+      return normalized;
+    });
   };
 
   const keys: PadKey[] = [
     { kind: "digit", label: "1", value: "1" },
     { kind: "digit", label: "2", value: "2" },
     { kind: "digit", label: "3", value: "3" },
-    { kind: "action", label: "Xóa số", onPress: backspace },
+    { kind: "action", label: "Xóa số", isDelete: true },
     { kind: "digit", label: "4", value: "4" },
     { kind: "digit", label: "5", value: "5" },
     { kind: "digit", label: "6", value: "6" },
@@ -95,6 +134,34 @@ export default function NumberPad({
 
         const isOperator = key.label === "Thu nhập" || key.label === "Chi tiêu";
 
+        if (key.isDelete) {
+          return (
+            <motion.button
+              key={`action-delete-${index}`}
+              type="button"
+              whileTap={{ scale: 0.92 }}
+              onPointerDown={startDelete}
+              onPointerUp={() => {
+                stopDelete();
+                if (!isLongPressRef.current) {
+                  backspace();
+                }
+              }}
+              onPointerLeave={stopDelete}
+              onPointerCancel={stopDelete}
+              className={`${baseClass} bg-surface text-text-primary active:bg-surface-secondary`}
+              aria-label={key.label}
+            >
+              <HugeiconsIcon
+                icon={Eraser01Icon}
+                size={24}
+                strokeWidth={2}
+                className="rotate-180"
+              />
+            </motion.button>
+          );
+        }
+
         return (
           <motion.button
             key={`action-${index}`}
@@ -110,14 +177,6 @@ export default function NumberPad({
             }
             aria-label={key.label}
           >
-            {index === 3 && (
-              <HugeiconsIcon
-                icon={Eraser01Icon}
-                size={24}
-                strokeWidth={2}
-                className="rotate-180"
-              />
-            )}
             {index === 7 && <HugeiconsIcon icon={PlusSignIcon} size={24} strokeWidth={2} />}
             {index === 11 && <HugeiconsIcon icon={MinusSignIcon} size={24} strokeWidth={2} />}
             {index === 14 && <HugeiconsIcon icon={Calendar03Icon} size={24} strokeWidth={1.8} />}

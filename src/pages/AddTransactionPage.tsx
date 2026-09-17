@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/toast";
 import { saveTransaction } from "@/services/transactionService";
 import { getCurrencySymbol } from "@/utils/currency";
 import { getWallets, type Wallet } from "@/types/wallets";
+import { AnimatedAmount } from "@/components/transactions/AnimatedAmount";
 
 export interface TransactionDraft {
   type: "income" | "expense";
@@ -36,6 +37,7 @@ export interface TransactionDraft {
   time: string; // HH:mm
 }
 
+/* ================= HELPER FUNCTIONS ================= */
 const todayISO = () => {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -69,6 +71,7 @@ function walletName(wallet?: Wallet): string {
   );
 }
 
+/* ================= MAIN PAGE COMPONENT ================= */
 export default function AddTransactionPage() {
   const navigate = useNavigate();
   const state = useLocation().state as { draft?: TransactionDraft } | null;
@@ -186,10 +189,15 @@ export default function AddTransactionPage() {
             </button>
           ))}
         </div>
+
+        {/* KHU VỰC NHẬP SỐ TIỀN VÀ GHI CHÚ */}
         <div className="py-6 text-center">
-          <p className="break-all text-5xl font-bold tracking-tight tabular-nums">
-            {formattedAmount} {getCurrencySymbol("VND")}
-          </p>
+          <AnimatedAmount
+            value={formattedAmount}
+            symbol={getCurrencySymbol("VND")}
+            className="text-5xl font-bold tracking-tight"
+          />
+
           <input
             value={note}
             onChange={(event) => setNote(event.target.value)}
@@ -200,6 +208,8 @@ export default function AddTransactionPage() {
             className="mt-4 w-full border-b border-border bg-transparent px-2 py-2 text-center text-base outline-none placeholder:text-text-secondary focus:placeholder:text-transparent caret-primary focus:border-primary"
           />
         </div>
+
+        {/* CHỌN VÍ / TÀI KHOẢN */}
         <button
           type="button"
           onClick={() => goTo("/add/wallet")}
@@ -219,6 +229,8 @@ export default function AddTransactionPage() {
           </span>
           <HugeiconsIcon icon={ArrowRight01Icon} size={18} className="shrink-0 text-text-tertiary" />
         </button>
+
+        {/* CHỌN DANH MỤC */}
         <div className="mt-4 pb-2">
           <p className="mb-2 px-1 text-sm font-semibold text-text-secondary">Danh mục</p>
           <CategoryPicker categories={categories} selected={categoryId} onSelect={setCategoryId} />
@@ -246,71 +258,71 @@ export default function AddTransactionPage() {
               <DrawerTitle className="text-lg font-bold">Ngày giao dịch</DrawerTitle>
             </DrawerHeader>
             <div className="flex flex-col items-center gap-4 px-4 pb-6">
-            <Calendar
-              mode="single"
-              selected={parseDate(date)}
-              onSelect={(day) => {
-                if (!day) return;
-                const y = day.getFullYear();
-                const m = String(day.getMonth() + 1).padStart(2, "0");
-                const d = String(day.getDate()).padStart(2, "0");
-                setDate(`${y}-${m}-${d}`);
-              }}
-              month={parseDate(date)}
-              onMonthChange={(month) => {
-                const y = month.getFullYear();
-                const m = String(month.getMonth() + 1).padStart(2, "0");
-                setDate(`${y}-${m}-${date.slice(8, 10)}`);
-              }}
-              fixedWeeks
-              locale={vi}
-              className="w-full max-w-sm"
-            />
-
-            {/* PRESETS */}
-            <div className="grid w-full max-w-sm grid-cols-3 gap-2">
-              {presets.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => setDate(preset.value)}
-                  className={`h-10 rounded-xl text-sm font-semibold transition-colors ${
-                    date === preset.value
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-surface text-text-secondary"
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-
-            {/* TIME PICKER */}
-            <div className="flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl bg-surface p-4">
-              <TimeSpinner
-                label="Giờ"
-                value={hour}
-                min={0}
-                max={23}
-                onChange={(h) => setTimeParts(h, minute)}
+              <Calendar
+                mode="single"
+                selected={parseDate(date)}
+                onSelect={(day) => {
+                  if (!day) return;
+                  const y = day.getFullYear();
+                  const m = String(day.getMonth() + 1).padStart(2, "0");
+                  const d = String(day.getDate()).padStart(2, "0");
+                  setDate(`${y}-${m}-${d}`);
+                }}
+                month={parseDate(date)}
+                onMonthChange={(month) => {
+                  const y = month.getFullYear();
+                  const m = String(month.getMonth() + 1).padStart(2, "0");
+                  setDate(`${y}-${m}-${date.slice(8, 10)}`);
+                }}
+                fixedWeeks
+                locale={vi}
+                className="w-full max-w-sm"
               />
-              <span className="text-3xl font-bold text-text-secondary">:</span>
-              <TimeSpinner
-                label="Phút"
-                value={minute}
-                min={0}
-                max={59}
-                onChange={(m) => setTimeParts(hour, m)}
-              />
-            </div>
 
-            <Button
-              onClick={() => setDateOpen(false)}
-              className="h-12 w-full max-w-sm rounded-xl text-base"
-            >
-              <HugeiconsIcon icon={Tick02Icon} size={20} strokeWidth={2.2} />
-              Xong
-            </Button>
+              {/* PRESETS */}
+              <div className="grid w-full max-w-sm grid-cols-3 gap-2">
+                {presets.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setDate(preset.value)}
+                    className={`h-10 rounded-xl text-sm font-semibold transition-colors ${
+                      date === preset.value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-surface text-text-secondary"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* TIME PICKER */}
+              <div className="flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl bg-surface p-4">
+                <TimeSpinner
+                  label="Giờ"
+                  value={hour}
+                  min={0}
+                  max={23}
+                  onChange={(h) => setTimeParts(h, minute)}
+                />
+                <span className="text-3xl font-bold text-text-secondary">:</span>
+                <TimeSpinner
+                  label="Phút"
+                  value={minute}
+                  min={0}
+                  max={59}
+                  onChange={(m) => setTimeParts(hour, m)}
+                />
+              </div>
+
+              <Button
+                onClick={() => setDateOpen(false)}
+                className="h-12 w-full max-w-sm rounded-xl text-base"
+              >
+                <HugeiconsIcon icon={Tick02Icon} size={20} strokeWidth={2.2} />
+                Xong
+              </Button>
             </div>
           </div>
         </DrawerContent>
@@ -319,6 +331,7 @@ export default function AddTransactionPage() {
   );
 }
 
+/* ================= TIME SPINNER COMPONENT ================= */
 function TimeSpinner({
   label,
   value,
