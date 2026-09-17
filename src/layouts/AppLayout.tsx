@@ -14,8 +14,23 @@ import RightDrawerMenu from "../components/layout/RightDrawerMenu";
 
 import { NavigationProvider } from "../contexts/NavigationContext";
 import { Toaster } from "@/components/ui/toast";
+import { SecurityProvider } from "@/security/SecurityContext";
+import { useSecurity } from "@/security/useSecurity";
+import { LockScreen } from "@/security/LockScreen";
 
 const ROOT_PATHS = ["/home", "/reports", "/wallets", "/profile"];
+
+function AppSecurityShell() {
+  const { isReady, isLocked } = useSecurity();
+  if (!isReady) return null;
+
+  return (
+    <>
+      <AppLayout />
+      {isLocked && <LockScreen />}
+    </>
+  );
+}
 
 function AppLayout() {
   const { pathname } = useLocation();
@@ -100,4 +115,10 @@ function AppLayout() {
   );
 }
 
-export default AppLayout;
+export default function ProtectedAppLayout() {
+  return (
+    <SecurityProvider>
+      <AppSecurityShell />
+    </SecurityProvider>
+  );
+}

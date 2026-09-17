@@ -21,6 +21,8 @@ import AvatarEditModal from "@/components/profile/AvatarEditModal";
 import UserGuideModal from "@/components/profile/UserGuideModal";
 import DataBackupModal from "@/components/profile/DataBackupModal";
 import { getUserProfile, saveUserProfile } from "../utils/userStorage";
+import { SecurityDialog } from "@/security/SecurityDialog";
+import { useSecurity } from "@/security/useSecurity";
 
 function ProfilePage() {
   const [profileData, setProfileData] = useState(() => getUserProfile());
@@ -29,6 +31,8 @@ function ProfilePage() {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isSecurityOpen, setIsSecurityOpen] = useState(false);
+  const { settings } = useSecurity();
 
   // Sync theme status on mount & change
   useEffect(() => {
@@ -330,6 +334,32 @@ function ProfilePage() {
           {/* Data Backup item */}
           <button
             type="button"
+            onClick={() => setIsSecurityOpen(true)}
+            className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
+                <HugeiconsIcon icon={ShieldCheckIcon} size={18} strokeWidth={2} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">Khóa bảo mật</p>
+                <p className="text-[11px] text-text-secondary mt-0.5">
+                  {settings?.enabled ? "Đã bật" : "Chưa thiết lập"}
+                </p>
+              </div>
+            </div>
+
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={18}
+              strokeWidth={2}
+              className="text-text-tertiary"
+            />
+          </button>
+
+          {/* Data Backup item */}
+          <button
+            type="button"
             onClick={() => setIsBackupOpen(true)}
             className="flex w-full items-center justify-between px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
           >
@@ -419,6 +449,8 @@ function ProfilePage() {
         onClose={() => setIsEditingAvatar(false)}
         onSave={handleSaveAvatar}
       />
+
+      <SecurityDialog key={isSecurityOpen ? "open" : "closed"} open={isSecurityOpen} onOpenChange={setIsSecurityOpen} />
 
       <UserGuideModal
         open={isGuideOpen}
