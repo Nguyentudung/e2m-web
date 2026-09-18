@@ -15,6 +15,7 @@ import {
   FingerPrintIcon,
   GiftIcon,
   QrCodeIcon,
+  Download01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { Switch } from "@/components/ui/switch";
@@ -473,6 +474,34 @@ function ProfilePage() {
               className="text-text-tertiary"
             />
           </button>
+
+          {/* Android app download item */}
+          <a
+            href="/app-debug.apk"
+            download="montra-app.apk"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-surface-secondary/40 transition-colors active:bg-surface-secondary/60"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D2129] dark:bg-white/15 text-white">
+                <HugeiconsIcon icon={Download01Icon} size={18} strokeWidth={2} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">
+                  Tải ứng dụng Android
+                </p>
+                <p className="text-[11px] text-text-secondary mt-0.5">
+                  Tải tệp APK để cài đặt trên điện thoại
+                </p>
+              </div>
+            </div>
+
+            <HugeiconsIcon
+              icon={ArrowRight01Icon}
+              size={18}
+              strokeWidth={2}
+              className="text-text-tertiary"
+            />
+          </a>
 
           {/* App info item */}
           <div className="flex items-center justify-between px-4 py-3.5">
