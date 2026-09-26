@@ -21,63 +21,69 @@ export const VersionChecker: React.FC = () => {
       const comparison = compareVersions(CURRENT_VERSION, info.version);
       setHasNewVersion(comparison > 0);
     } catch (err) {
-      setError('Không thể kiểm tra phiên bản. Vui lòng thử lại.');
+      setError('Không thể kiểm tra cập nhật. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-surface border border-gray-200 dark:border-gray-800 rounded-2xl p-6 md:p-8 max-w-xl mx-auto shadow-sm">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+    <div className="border border-gray-200 rounded-xl p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Phiên bản hiện tại</h3>
-          <p className="text-gray-500 dark:text-gray-400">v{CURRENT_VERSION}</p>
+          <p className="text-sm text-gray-500">Phiên bản hiện tại</p>
+          <p className="font-medium text-foreground mt-0.5">v{CURRENT_VERSION}</p>
         </div>
         <button
           onClick={checkVersion}
           disabled={loading}
-          className="w-full md:w-auto px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-foreground font-medium rounded-xl transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 w-full sm:w-auto"
         >
-          {loading ? 'Đang kiểm tra...' : 'Kiểm tra phiên bản'}
+          {loading ? 'Đang kiểm tra...' : 'Kiểm tra cập nhật'}
         </button>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-sm mb-4">
+        <div className="mt-4 text-sm text-red-600">
           {error}
         </div>
       )}
 
       {hasNewVersion === false && (
-        <div className="p-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-xl text-sm mb-4">
+        <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
           Bạn đang sử dụng phiên bản mới nhất.
         </div>
       )}
 
       {hasNewVersion === true && updateInfo && (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="p-5 bg-primary/10 border border-primary/20 rounded-xl mb-6">
-            <h4 className="text-primary-dark dark:text-primary-light font-semibold mb-2">
-              Đã có phiên bản mới: v{updateInfo.version}
-            </h4>
-            
-            <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tính năng mới:</p>
-              <ul className="list-disc pl-5 space-y-1">
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-sm font-medium text-primary mb-1">
+            Đã có phiên bản mới
+          </p>
+          <p className="text-sm text-gray-600 mb-4">
+            v{CURRENT_VERSION} → <span className="font-semibold text-foreground">v{updateInfo.version}</span>
+          </p>
+          
+          {updateInfo.release_notes.length > 0 && (
+            <div className="mb-5">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 font-medium">Chi tiết thay đổi</p>
+              <ul className="space-y-1.5">
                 {updateInfo.release_notes.map((note, index) => (
-                  <li key={index} className="text-sm text-gray-600 dark:text-gray-400">{note}</li>
+                  <li key={index} className="text-sm text-gray-600 flex items-start gap-2">
+                    <span className="text-gray-400 mt-0.5">•</span>
+                    {note}
+                  </li>
                 ))}
               </ul>
             </div>
+          )}
 
-            <a
-              href={updateInfo.download_url}
-              className="inline-flex items-center justify-center w-full px-6 py-3 bg-primary hover:bg-primary-dark text-white font-medium rounded-xl transition-colors"
-            >
-              Tải phiên bản mới
-            </a>
-          </div>
+          <a
+            href={updateInfo.download_url}
+            className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Cập nhật ngay
+          </a>
         </div>
       )}
     </div>
