@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "build": 1,
+  "download_url": "/download/e2m-v1.0.0.apk",
+  "release_notes": [
+    "Phiên bản đầu tiên của e2m",
+    "Quản lý thu chi cơ bản",
+    "Giao diện hiện đại, tối giản"
+  ]
+}
