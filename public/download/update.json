@@ -2,7 +2,7 @@
   "android": {
     "version": "1.0.1",
     "build": 2,
-    "download_url": "/download/e2m-v1.0.0.apk",
+    "download_url": "/download/e2m-v1.0.1.apk",
     "available": true,
     "release_notes": ["Nâng cấp trải nghiệm người dùng"]
   },
