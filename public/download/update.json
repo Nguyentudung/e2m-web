@@ -4,11 +4,7 @@
     "build": 2,
     "download_url": "/download/e2m-v1.0.0.apk",
     "available": true,
-    "release_notes": [
-      "Phiên bản đầu tiên của e2m",
-      "Quản lý thu chi cơ bản",
-      "Giao diện hiện đại, tối giản"
-    ]
+    "release_notes": ["Nâng cấp trải nghiệm người dùng"]
   },
   "ios": {
     "version": null,
