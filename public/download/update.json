@@ -1,8 +1,8 @@
 {
   "android": {
-    "version": "1.0.30",
+    "version": "1.0.32",
     "build": 1,
-    "download_url": "/download/e2m-v1.0.30.apk",
+    "download_url": "/download/e2m-v1.0.32.apk",
     "available": true,
     "release_notes": ["Nâng cấp trải nghiệm người dùng"]
   },
